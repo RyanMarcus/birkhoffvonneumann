@@ -1,4 +1,4 @@
-// { begin copyright } 
+// < begin copyright > 
 // Copyright Ryan Marcus 2016
 // 
 // This file is part of brikhoffvonneumann.
@@ -16,18 +16,15 @@
 // You should have received a copy of the GNU General Public License
 // along with brikhoffvonneumann.  If not, see <http://www.gnu.org/licenses/>.
 // 
-// { end copyright } 
+// < end copyright > 
 package info.rmarcus.brikhoffvonneumann.exceptions;
 
 public class BVNNonSquareMatrixException extends BVNException {
 
+	private static final long serialVersionUID = 1L;
+	
 	public BVNNonSquareMatrixException() {
 		super("The array passed to the BVN decomposer must represent a square matrix (it cannot be any other shape or null)");
 	}
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 
 }

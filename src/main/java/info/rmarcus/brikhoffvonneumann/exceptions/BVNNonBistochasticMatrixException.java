@@ -1,4 +1,4 @@
-// { begin copyright } 
+// < begin copyright > 
 // Copyright Ryan Marcus 2016
 // 
 // This file is part of brikhoffvonneumann.
@@ -16,18 +16,17 @@
 // You should have received a copy of the GNU General Public License
 // along with brikhoffvonneumann.  If not, see <http://www.gnu.org/licenses/>.
 // 
-// { end copyright } 
+// < end copyright > 
 package info.rmarcus.brikhoffvonneumann.exceptions;
 
 public class BVNNonBistochasticMatrixException extends BVNException {
 
+	private static final long serialVersionUID = 1L;
+	
 	public BVNNonBistochasticMatrixException() {
 		super("The matrix to decompose must be bistochastic (the sum of all of its rows and columns must be equal to one).");
 	}
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+
 
 }

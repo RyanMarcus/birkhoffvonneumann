@@ -1,4 +1,4 @@
-// { begin copyright } 
+// < begin copyright > 
 // Copyright Ryan Marcus 2016
 // 
 // This file is part of brikhoffvonneumann.
@@ -16,14 +16,11 @@
 // You should have received a copy of the GNU General Public License
 // along with brikhoffvonneumann.  If not, see <http://www.gnu.org/licenses/>.
 // 
-// { end copyright } 
+// < end copyright > 
 package info.rmarcus.brikhoffvonneumann.exceptions;
 
 public class BVNException extends Exception {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	public BVNException(String msg) {

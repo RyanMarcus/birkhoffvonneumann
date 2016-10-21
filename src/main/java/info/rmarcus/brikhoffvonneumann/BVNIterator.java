@@ -1,4 +1,4 @@
-// { begin copyright } 
+// < begin copyright > 
 // Copyright Ryan Marcus 2016
 // 
 // This file is part of brikhoffvonneumann.
@@ -16,13 +16,14 @@
 // You should have received a copy of the GNU General Public License
 // along with brikhoffvonneumann.  If not, see <http://www.gnu.org/licenses/>.
 // 
-// { end copyright } 
+// < end copyright > 
 package info.rmarcus.brikhoffvonneumann;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 
@@ -31,7 +32,6 @@ import org.jgrapht.alg.HopcroftKarpBipartiteMatching;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
 
-import info.rmarcus.brikhoffvonneumann.exceptions.BVNInvalidNextCall;
 
 public class BVNIterator implements Iterator<CoeffAndMatrix> {
 	private final double[][] matrix;
@@ -47,7 +47,13 @@ public class BVNIterator implements Iterator<CoeffAndMatrix> {
 
 	@Override
 	public CoeffAndMatrix next() {
-		Index smallestNonZero = findSmallestNonZero(matrix).orElseThrow(() -> new BVNInvalidNextCall());
+		// we could do this with orElseThrow, but SonarLint doesn't recognize that
+		Optional<Index> smallestNonZeroOpt = findSmallestNonZero(matrix);
+		
+		if (!smallestNonZeroOpt.isPresent())
+			throw new NoSuchElementException();
+		
+		Index smallestNonZero = smallestNonZeroOpt.get();
 
 		double coeff = matrix[smallestNonZero.row][smallestNonZero.col];
 		double[][] perm = getNextPerm();
@@ -64,7 +70,7 @@ public class BVNIterator implements Iterator<CoeffAndMatrix> {
 
 	private double[][] getNextPerm() {
 		UndirectedGraph<LabeledInt, DefaultEdge> g =
-				new SimpleGraph<LabeledInt, DefaultEdge>(DefaultEdge.class);
+				new SimpleGraph<>(DefaultEdge.class);
 
 		// we will create a bipartite graph where the partitions are two sets
 		// of nodes, 1,2,3 for each row and column
@@ -76,7 +82,8 @@ public class BVNIterator implements Iterator<CoeffAndMatrix> {
 			LabeledInt l1 = new LabeledInt(row, true);
 			LabeledInt l2 = new LabeledInt(row, false);
 
-			p1.add(l1); p2.add(l2);
+			p1.add(l1); 
+			p2.add(l2);
 			g.addVertex(l1);
 			g.addVertex(l2);
 		}

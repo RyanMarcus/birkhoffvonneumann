@@ -1,4 +1,4 @@
-// { begin copyright } 
+// < begin copyright > 
 // Copyright Ryan Marcus 2016
 // 
 // This file is part of brikhoffvonneumann.
@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with brikhoffvonneumann.  If not, see <http://www.gnu.org/licenses/>.
 // 
-// { end copyright } 
+// < end copyright > 
 package info.rmarcus.brikhoffvonneumann;
 
 public class CoeffAndMatrix {

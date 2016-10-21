@@ -1,4 +1,4 @@
-// { begin copyright } 
+// < begin copyright > 
 // Copyright Ryan Marcus 2016
 // 
 // This file is part of brikhoffvonneumann.
@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with brikhoffvonneumann.  If not, see <http://www.gnu.org/licenses/>.
 // 
-// { end copyright } 
+// < end copyright > 
 package info.rmarcus.brikhoffvonneumann;
 
 import java.util.Arrays;
@@ -34,6 +34,8 @@ import info.rmarcus.brikhoffvonneumann.exceptions.BVNNonSquareMatrixException;
 public class BVNDecomposer {
 	static final double EPSILON = 0.0001;
 
+	private BVNDecomposer() {}
+	
 	/**
 	 * Produces a decomposition. The input matrix must be square and bistochastic.
 	 * 
@@ -55,6 +57,9 @@ public class BVNDecomposer {
 	 * @throws BVNException if the matrix is not square or if the matrix is not bistochastic
 	 */
 	public static Iterator<CoeffAndMatrix> decomposeBiStocastic(double[][] matrix) throws BVNException {
+		if (matrix == null) {
+			throw new BVNNonSquareMatrixException();
+		}
 		checkMatrixInput(matrix);
 		return new BVNIterator(matrix);
 	}
@@ -62,9 +67,6 @@ public class BVNDecomposer {
 	
 	private static void checkMatrixInput(double[][] matrix) throws BVNNonSquareMatrixException, BVNNonBistochasticMatrixException {
 		// check to make sure the matrix is square
-		if (matrix == null) {
-			throw new BVNNonSquareMatrixException();
-		}
 		
 		int matrixHeight = matrix.length;
 		if (Arrays.stream(matrix).anyMatch(row -> row.length != matrixHeight))
