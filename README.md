@@ -4,6 +4,15 @@
 
 This package provides an implementation of Brikhoff's heuristic for generating Brikhoff-von Neumann decompositions of [bistochastic matricies](https://en.wikipedia.org/wiki/Doubly_stochastic_matrix).
 
+Maven:
+```xml
+<dependency>
+    <groupId>info.rmarcus</groupId>
+	<artifactId>brikhoffvonneumann</artifactId>
+	<version>0.0.1</version>
+</dependency>
+```
+
 The algorithm decomposes a square bistochastic matrix (a matrix whose column and row sums are all equal to one) into a convex combination of permutation matrices. Each entry `i,j` in the bistochastic matrix can be interpreted as the probability that a permutation swapping elements `i` and `j` will appear in the (weighted) decomposition.
 
 
