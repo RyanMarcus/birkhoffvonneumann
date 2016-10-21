@@ -17,19 +17,18 @@
 // along with brikhoffvonneumann.  If not, see <http://www.gnu.org/licenses/>.
 // 
 // { end copyright } 
-package edu.brandeis.brikhoffvonneumann;
+package info.rmarcus.brikhoffvonneumann;
 
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.stream.IntStream;
 
-import edu.brandeis.brikhoffvonneumann.exceptions.BVNException;
-import edu.brandeis.brikhoffvonneumann.exceptions.BVNNonBistochasticMatrixException;
-import edu.brandeis.brikhoffvonneumann.exceptions.BVNNonSquareMatrixException;
+import info.rmarcus.brikhoffvonneumann.exceptions.BVNException;
+import info.rmarcus.brikhoffvonneumann.exceptions.BVNNonBistochasticMatrixException;
+import info.rmarcus.brikhoffvonneumann.exceptions.BVNNonSquareMatrixException;
 
 /**
  * A class to produce Brikhoff von-Neumann decompositions of bistochastic matrices
- * @author "Ryan Marcus <rcmarcus@brandeis.edu>"
  *
  */
 public class BVNDecomposer {

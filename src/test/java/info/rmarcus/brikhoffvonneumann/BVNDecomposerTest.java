@@ -17,7 +17,7 @@
 // along with brikhoffvonneumann.  If not, see <http://www.gnu.org/licenses/>.
 // 
 // { end copyright } 
-package edu.brandeis.brikhoffvonneumann;
+package info.rmarcus.brikhoffvonneumann;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -28,9 +28,11 @@ import java.util.Iterator;
 
 import org.junit.Test;
 
-import edu.brandeis.brikhoffvonneumann.exceptions.BVNException;
-import edu.brandeis.brikhoffvonneumann.exceptions.BVNNonBistochasticMatrixException;
-import edu.brandeis.brikhoffvonneumann.exceptions.BVNNonSquareMatrixException;
+import info.rmarcus.brikhoffvonneumann.BVNDecomposer;
+import info.rmarcus.brikhoffvonneumann.CoeffAndMatrix;
+import info.rmarcus.brikhoffvonneumann.exceptions.BVNException;
+import info.rmarcus.brikhoffvonneumann.exceptions.BVNNonBistochasticMatrixException;
+import info.rmarcus.brikhoffvonneumann.exceptions.BVNNonSquareMatrixException;
 
 public class BVNDecomposerTest {
 

@@ -17,7 +17,7 @@
 // along with brikhoffvonneumann.  If not, see <http://www.gnu.org/licenses/>.
 // 
 // { end copyright } 
-package edu.brandeis.brikhoffvonneumann;
+package info.rmarcus.brikhoffvonneumann;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,7 +31,7 @@ import org.jgrapht.alg.HopcroftKarpBipartiteMatching;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
 
-import edu.brandeis.brikhoffvonneumann.exceptions.BVNInvalidNextCall;
+import info.rmarcus.brikhoffvonneumann.exceptions.BVNInvalidNextCall;
 
 public class BVNIterator implements Iterator<CoeffAndMatrix> {
 	private final double[][] matrix;

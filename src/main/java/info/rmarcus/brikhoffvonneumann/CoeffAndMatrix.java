@@ -17,7 +17,7 @@
 // along with brikhoffvonneumann.  If not, see <http://www.gnu.org/licenses/>.
 // 
 // { end copyright } 
-package edu.brandeis.brikhoffvonneumann;
+package info.rmarcus.brikhoffvonneumann;
 
 public class CoeffAndMatrix {
 	public final double coeff;

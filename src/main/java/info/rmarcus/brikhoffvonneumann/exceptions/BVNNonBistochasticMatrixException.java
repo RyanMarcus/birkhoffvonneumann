@@ -17,12 +17,12 @@
 // along with brikhoffvonneumann.  If not, see <http://www.gnu.org/licenses/>.
 // 
 // { end copyright } 
-package edu.brandeis.brikhoffvonneumann.exceptions;
+package info.rmarcus.brikhoffvonneumann.exceptions;
 
-public class BVNNonSquareMatrixException extends BVNException {
+public class BVNNonBistochasticMatrixException extends BVNException {
 
-	public BVNNonSquareMatrixException() {
-		super("The array passed to the BVN decomposer must represent a square matrix (it cannot be any other shape or null)");
+	public BVNNonBistochasticMatrixException() {
+		super("The matrix to decompose must be bistochastic (the sum of all of its rows and columns must be equal to one).");
 	}
 
 	/**

@@ -17,18 +17,16 @@
 // along with brikhoffvonneumann.  If not, see <http://www.gnu.org/licenses/>.
 // 
 // { end copyright } 
-package edu.brandeis.brikhoffvonneumann.exceptions;
+package info.rmarcus.brikhoffvonneumann.exceptions;
 
-import java.util.NoSuchElementException;
-
-public class BVNInvalidNextCall extends NoSuchElementException {
+public class BVNException extends Exception {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public BVNInvalidNextCall() {
-		super("You cannot call next() on the iterator when hasNext() returns false!");
+	public BVNException(String msg) {
+		super(msg);
 	}
 }
