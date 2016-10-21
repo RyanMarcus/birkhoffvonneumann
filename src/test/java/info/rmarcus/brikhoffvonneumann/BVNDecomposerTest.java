@@ -24,8 +24,10 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import org.junit.Test;
 
@@ -73,9 +75,14 @@ public class BVNDecomposerTest {
 		assertArrayEquals(cam.matrix[1], r2, BVNDecomposer.EPSILON);
 		assertArrayEquals(cam.matrix[2], r3, BVNDecomposer.EPSILON);
 
-
-
 		assertFalse(i.hasNext());
+		
+		try {
+			i.next();
+			fail("should have thrown exception!");
+		} catch (NoSuchElementException e) {
+			// good!
+		}
 	}
 
 	@Test
