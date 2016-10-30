@@ -17,8 +17,28 @@
 // along with brikhoffvonneumann.  If not, see <http://www.gnu.org/licenses/>.
 // 
 // < end copyright > 
+// < begin copyright > 
+// Copyright Ryan Marcus 2016
+// 
+// This file is part of brikhoffvonneumann.
+// 
+// brikhoffvonneumann is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// brikhoffvonneumann is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with brikhoffvonneumann.  If not, see <http://www.gnu.org/licenses/>.
+// 
+// < end copyright > 
 package info.rmarcus.brikhoffvonneumann;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -49,15 +69,15 @@ public class BVNIterator implements Iterator<CoeffAndMatrix> {
 	public CoeffAndMatrix next() {
 		// we could do this with orElseThrow, but SonarLint doesn't recognize that
 		Optional<Index> smallestNonZeroOpt = findSmallestNonZero(matrix);
-		
+
 		if (!smallestNonZeroOpt.isPresent())
 			throw new NoSuchElementException();
-		
+
 		Index smallestNonZero = smallestNonZeroOpt.get();
 
 		double coeff = matrix[smallestNonZero.row][smallestNonZero.col];
-		double[][] perm = getNextPerm();
-		
+		double[][] perm = getNextPerm(smallestNonZero);
+
 		// subtract coeff * perm from this.matrix
 		for (int row = 0; row < matrix.length; row++) {
 			for (int col = 0; col < matrix[row].length; col++) {
@@ -68,7 +88,7 @@ public class BVNIterator implements Iterator<CoeffAndMatrix> {
 		return new CoeffAndMatrix(coeff, perm);
 	}
 
-	private double[][] getNextPerm() {
+	private double[][] getNextPerm(Index edgeToForce) {
 		UndirectedGraph<LabeledInt, DefaultEdge> g =
 				new SimpleGraph<>(DefaultEdge.class);
 
@@ -89,23 +109,33 @@ public class BVNIterator implements Iterator<CoeffAndMatrix> {
 		}
 
 		// there is an edge between vertex A and vertex B iff 
-		// matrix[A][B] is non-zero
+		// matrix[A][B] is non-zero. However, we want to force
+		// the edge that corrosponds to the lowest weight in the matrix
+		// to be selected in the matching.
 		for (int row = 0; row < matrix.length; row++) {
 			for (int col = 0; col < matrix[row].length; col++) {
-				if (Math.abs(matrix[row][col] - 0) > BVNDecomposer.EPSILON)
-					g.addEdge(new LabeledInt(row, true), new LabeledInt(col, false));
+				// if the entry is zero, ignore it.
+				if (Math.abs(matrix[row][col] - 0) <= BVNDecomposer.EPSILON)
+					continue;
+				
+				// only include the forced edge from the edgeToForce.row row.
+				if (row == edgeToForce.row && col != edgeToForce.col)
+					continue;
+				
+				g.addEdge(new LabeledInt(row, true), new LabeledInt(col, false));
+
 			}
 		}
-		
+
 		Set<DefaultEdge> matching = (new HopcroftKarpBipartiteMatching<LabeledInt, DefaultEdge>(g, p1, p2)).getMatching();
 		double[][] toR = new double[matrix.length][matrix.length];
-		
+
 		for (DefaultEdge de : matching) {
 			int row = g.getEdgeSource(de).i;
 			int col = g.getEdgeTarget(de).i;
 			toR[row][col] = 1;
 		}
-	
+
 		return toR;
 	}
 

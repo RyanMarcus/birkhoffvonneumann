@@ -17,14 +17,30 @@
 // along with brikhoffvonneumann.  If not, see <http://www.gnu.org/licenses/>.
 // 
 // < end copyright > 
+// < begin copyright > 
+// Copyright Ryan Marcus 2016
+// 
+// This file is part of brikhoffvonneumann.
+// 
+// brikhoffvonneumann is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// brikhoffvonneumann is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with brikhoffvonneumann.  If not, see <http://www.gnu.org/licenses/>.
+// 
+// < end copyright > 
 package info.rmarcus.brikhoffvonneumann;
 
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.stream.IntStream;
 
 import info.rmarcus.brikhoffvonneumann.exceptions.BVNException;
-import info.rmarcus.brikhoffvonneumann.exceptions.BVNNonBistochasticMatrixException;
 import info.rmarcus.brikhoffvonneumann.exceptions.BVNNonSquareMatrixException;
 
 /**
@@ -56,38 +72,58 @@ public class BVNDecomposer {
 	 * @return an iterator over the permutations that compose the input matrix.
 	 * @throws BVNException if the matrix is not square or if the matrix is not bistochastic
 	 */
-	public static Iterator<CoeffAndMatrix> decomposeBiStocastic(double[][] matrix) throws BVNException {
+	public static Iterator<CoeffAndMatrix> decomposeBistocastic(double[][] matrix) throws BVNException {
 		if (matrix == null) {
 			throw new BVNNonSquareMatrixException();
 		}
-		checkMatrixInput(matrix);
+		BVNUtils.checkMatrixInput(matrix);
 		return new BVNIterator(matrix);
 	}
 	
-	
-	private static void checkMatrixInput(double[][] matrix) throws BVNNonSquareMatrixException, BVNNonBistochasticMatrixException {
-		// check to make sure the matrix is square
+	/**
+	 * Randomly samples a permutation from the decomposition. The parameter r should be
+	 * a random value between 0 and 1.
+	 * 
+	 * @param r a random value between 0 and 1.
+	 * @param matrix the matrix to decompose
+	 * @return a sample permutation from the matrix
+	 * @throws BVNException if the matrix is not square, bistochastic, or r is not between 0 and 1
+	 */
+	public static double[][] sample(double r, double[][] matrix) throws BVNException {
+		if (r < 0.0 || r > 1.0)
+			throw new BVNException("r must be between 0 and 1!");
 		
-		int matrixHeight = matrix.length;
-		if (Arrays.stream(matrix).anyMatch(row -> row.length != matrixHeight))
-			throw new BVNNonSquareMatrixException();
+		double rLeft = r;
+		Iterator<CoeffAndMatrix> i = decomposeBistocastic(matrix);
 		
+		CoeffAndMatrix candidate;
+		do {
+			candidate = i.next();
+			
+			if (!i.hasNext())
+				return candidate.matrix;
+			
+			rLeft -= candidate.coeff;
+		} while (rLeft > 0);
 		
-		// check to make sure the matrix is bistochastic.
-		// first, check the row sums.
-		if (Arrays.stream(matrix)
-				.map(row -> Arrays.stream(row).sum())
-				.anyMatch(d -> Math.abs(1.0 - d) > EPSILON))
-			throw new BVNNonBistochasticMatrixException();
-		
-		// next, check the column sums
-		if (IntStream.range(0, matrix.length).mapToDouble(i -> {
-			double collector = 0.0;
-			for (int j = 0; j < matrix[i].length; j++)
-				collector += matrix[i][j];
-			return collector;
-		}).anyMatch(d -> Math.abs(1 - d) > EPSILON))
-			throw new BVNNonBistochasticMatrixException();
+		return candidate.matrix;
 	}
+	
+	/**
+	 * Gets the mean permutation from the weight matrix (the permutation with the largest
+	 * coeff).
+	 * 
+	 * @param matrix the bistochastic weight matrix
+	 * @return the permutation with the largest coeff
+	 * @throws BVNException
+	 */
+	public static double[][] meanPermutation(double[][] matrix) throws BVNException {
+		Iterator<CoeffAndMatrix> i = decomposeBistocastic(matrix);
+		return StreamUtils.asStream(i)
+				.max((a, b) -> (int)Math.signum(a.coeff - b.coeff))
+				.map(c -> c.matrix)
+				.orElse(null);
+	}
+	
 	
 }
