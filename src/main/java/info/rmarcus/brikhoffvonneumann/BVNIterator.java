@@ -38,7 +38,6 @@
 // < end copyright > 
 package info.rmarcus.brikhoffvonneumann;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -115,11 +114,9 @@ public class BVNIterator implements Iterator<CoeffAndMatrix> {
 		for (int row = 0; row < matrix.length; row++) {
 			for (int col = 0; col < matrix[row].length; col++) {
 				// if the entry is zero, ignore it.
-				if (Math.abs(matrix[row][col] - 0) <= BVNDecomposer.EPSILON)
-					continue;
-				
 				// only include the forced edge from the edgeToForce.row row.
-				if (row == edgeToForce.row && col != edgeToForce.col)
+				if ((Math.abs(matrix[row][col] - 0) <= BVNDecomposer.EPSILON)
+						|| (row == edgeToForce.row && col != edgeToForce.col))
 					continue;
 				
 				g.addEdge(new LabeledInt(row, true), new LabeledInt(col, false));

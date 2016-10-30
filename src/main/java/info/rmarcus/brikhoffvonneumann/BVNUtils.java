@@ -20,13 +20,18 @@
 package info.rmarcus.brikhoffvonneumann;
 
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
 import info.rmarcus.brikhoffvonneumann.exceptions.BVNException;
 import info.rmarcus.brikhoffvonneumann.exceptions.BVNNonBistochasticMatrixException;
 import info.rmarcus.brikhoffvonneumann.exceptions.BVNNonSquareMatrixException;
+import info.rmarcus.brikhoffvonneumann.learners.PermELearn;
 
 class BVNUtils {
+	private static final Logger l = Logger.getLogger(PermELearn.class.getName());
+
 	private BVNUtils() {
 		
 	}
@@ -64,6 +69,7 @@ class BVNUtils {
 			checkMatrixInput(matrix);
 			return true;
 		} catch (BVNException e) {
+			l.log(Level.FINEST, "matrix was not bistochastic", e);
 			return false;
 		}
 	}

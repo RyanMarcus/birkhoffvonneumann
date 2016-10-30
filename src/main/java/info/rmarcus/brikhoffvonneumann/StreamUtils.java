@@ -25,6 +25,8 @@ import java.util.stream.StreamSupport;
 
 class StreamUtils {
 
+	private StreamUtils() {}
+	
 	static <T> Stream<T> asStream(Iterator<T> sourceIterator) {
 		return asStream(sourceIterator, false);
 	}

@@ -19,7 +19,6 @@
 // < end copyright > 
 package info.rmarcus.brikhoffvonneumann.learners;
 
-import java.util.Arrays;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -69,7 +68,7 @@ public class PermELearn {
 		for (int row = 0; row < w.length; row++) {
 			int bestIdx = 0;
 			for (int col = 1; col < w[row].length; col++) {
-				bestIdx = (w[row][col] > w[row][bestIdx] ? col : bestIdx);
+				bestIdx = w[row][col] > w[row][bestIdx] ? col : bestIdx;
 			}
 			
 			toR[row][bestIdx] = 1.0;
@@ -144,21 +143,11 @@ public class PermELearn {
 		
 		SinkhornBalancer.normalize(lossMatrix, toSort.length);
 		
-		System.out.println(Arrays.deepToString(lossMatrix));
 		
 		PermELearn pel = new PermELearn(toSort.length, 0.5);
 		for (int i = 0; i < 100; i++) {
-			double[][] perm = pel.iterateAndUpdateWeights(lossMatrix);
-			System.out.println(calculateLoss(perm, lossMatrix));
-			//System.out.println(Arrays.deepToString(perm));
+			pel.iterateAndUpdateWeights(lossMatrix);
 		}
-		
-		
-
-		
-		System.out.println(Arrays.deepToString(pel.getWeights()));
-		System.out.println(Arrays.deepToString(pel.getMeanPermutation()));
-
 		
 	}
 
