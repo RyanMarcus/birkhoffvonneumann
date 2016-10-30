@@ -146,7 +146,6 @@ public class BVNIterator implements Iterator<CoeffAndMatrix> {
 
 		double coeff = matrix[smallestNonZero.row][smallestNonZero.col];
 		double[][] perm = getNextPerm(smallestNonZero);
-		System.out.println(smallestNonZero + ": " + Arrays.deepToString(matrix));
 
 		// subtract coeff * perm from this.matrix
 		for (int row = 0; row < matrix.length; row++) {

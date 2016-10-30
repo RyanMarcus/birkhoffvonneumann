@@ -190,8 +190,7 @@ public class BVNDecomposerTest {
 		while (i.hasNext()) {
 			CoeffAndMatrix cm = i.next();
 			// ensure each element has exactly one entry that is a 1
-			System.out.println(Arrays.deepToString(cm.matrix));
-
+			
 			for (double[] row : cm.matrix) {
 				long numNonZero = Arrays.stream(row)
 						.filter(d -> d > 0.01)
