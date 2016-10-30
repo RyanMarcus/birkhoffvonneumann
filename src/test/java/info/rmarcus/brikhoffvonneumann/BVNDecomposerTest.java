@@ -45,6 +45,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -60,27 +61,27 @@ import info.rmarcus.brikhoffvonneumann.exceptions.BVNNonSquareMatrixException;
 public class BVNDecomposerTest {
 
 	@Test(expected=BVNNonSquareMatrixException.class)
-	public void shouldThrowOnNonSquare() throws BVNException {
+	public void shouldThrowOnNonSquareTest() throws BVNException {
 		BVNDecomposer.decomposeBistocastic(new double[][] {{0, 0, 0}});
 	}
 
 	@Test(expected=BVNNonSquareMatrixException.class)
-	public void shouldThrowOnNonSquare2() throws BVNException {
+	public void shouldThrowOnNonSquare2Test() throws BVNException {
 		BVNDecomposer.decomposeBistocastic(new double[][] {{0, 0, 0}, {0, 0, 0, 0}, {0,0,0} });
 	}
 
 	@Test(expected=BVNNonBistochasticMatrixException.class)
-	public void shouldThrowOnNonBi() throws BVNException {
+	public void shouldThrowOnNonBiTest() throws BVNException {
 		BVNDecomposer.decomposeBistocastic(new double[][] {{0, 0, 0}, {0, 0, 0}, {0,0,0} });
 	}
 
 	@Test(expected=BVNNonBistochasticMatrixException.class)
-	public void shouldThrowOnNonBi2() throws BVNException {
+	public void shouldThrowOnNonBi2Test() throws BVNException {
 		BVNDecomposer.decomposeBistocastic(new double[][] {{0, 1, 0}, {1, 0, 0}, {0,0,0.8} });
 	}
 
 	@Test
-	public void decompExpiresAfterOne() throws BVNException {
+	public void decompExpiresAfterOneTest() throws BVNException {
 		Iterator<CoeffAndMatrix> i = BVNDecomposer.decomposeBistocastic(new double[][] {{1, 0, 0}, {0, 1, 0}, {0,0,1} });
 
 		assertTrue(i.hasNext());
@@ -106,7 +107,7 @@ public class BVNDecomposerTest {
 	}
 
 	@Test
-	public void decompExpiresAfterTwo() throws BVNException {
+	public void decompExpiresAfterTwoTest() throws BVNException {
 		Iterator<CoeffAndMatrix> i = BVNDecomposer.decomposeBistocastic(new double[][] {{0.5, 0, 0.5}, {0, 1, 0}, {0.5,0,0.5} });
 
 		assertTrue(i.hasNext());
@@ -121,7 +122,7 @@ public class BVNDecomposerTest {
 	}
 
 	@Test
-	public void coeffSum() throws BVNException {
+	public void coeffSumTest() throws BVNException {
 		Iterator<CoeffAndMatrix> i = BVNDecomposer.decomposeBistocastic(new double[][] {{1./3., 1./3., 1./3.}, {1./3., 1./3., 1./3.}, {1./3.,1./3.,1./3.} });
 		double coeffSum = 0.0;
 
@@ -134,7 +135,7 @@ public class BVNDecomposerTest {
 	}
 
 	@Test
-	public void coeffSum2() throws BVNException {
+	public void coeffSum2Test() throws BVNException {
 		Iterator<CoeffAndMatrix> i = BVNDecomposer.decomposeBistocastic(new double[][] {{1./4., 1./4., 1./4., 1./4.}, 
 			{1./4., 1./4., 1./4., 1./4.}, 
 			{1./4., 1./4., 1./4., 1./4.},
@@ -151,7 +152,7 @@ public class BVNDecomposerTest {
 	}
 
 	@Test
-	public void noDuplicatePerms() throws BVNException {
+	public void noDuplicatePermsTest() throws BVNException {
 		double[][] m = new double[][] {
 			{0.12386116124039533, 0.19789512012353908, 0.3564696062871973, 0.19789512012353905, 0.12386116124039531}, 
 			{0.5243301492950436, 0.24001405039545726, 0.12386710429142027, 0.06876517675214192, 0.04303963958335231},
@@ -159,10 +160,11 @@ public class BVNDecomposerTest {
 			{0.24000613960770475, 0.38346196138005806, 0.19789809256498112, 0.1098636913488036, 0.06876291027350388},
 			{0.0430396395833523, 0.06876517675214192, 0.12386710429142027, 0.24001405039545726, 0.5243301492950437}
 		};
-		
+
+		SinkhornBalancer.balance(m);
 		Iterator<CoeffAndMatrix> i = BVNDecomposer.decomposeBistocastic(m);
 		Set<Set<Swap>> perms = new HashSet<>();
-		
+
 		while (i.hasNext()) {
 			CoeffAndMatrix cm = i.next();
 			Set<Swap> asSwaps = cm.asSwaps();
@@ -170,7 +172,56 @@ public class BVNDecomposerTest {
 			perms.add(asSwaps);
 		}
 
-}
+	}
+
+	@Test
+	public void allPermsValidTest() throws BVNException {
+		double[][] m = new double[][] {
+			{0.19792615205786793, 0.19999575588922414, 0.20407645656300846, 0.19999575588922414, 0.1979261520578679},
+			{0.21218201028385858, 0.2039442351693745, 0.1979560753458031, 0.19399775745040237, 0.191990222338926},
+			{0.19397807341132017, 0.19600639437728223, 0.20000569637269275, 0.20605585711371685, 0.2039235419080274},
+			{0.20392354190802736, 0.2060558571137168, 0.2000056963726927, 0.1960063943772822, 0.1939780734113201},
+			{0.19199022233892601, 0.19399775745040237, 0.1979560753458031, 0.2039442351693745, 0.21218201028385858}
+		};
+		
+		SinkhornBalancer.balance(m);
+		Iterator<CoeffAndMatrix> i = BVNDecomposer.decomposeBistocastic(m);
+
+		while (i.hasNext()) {
+			CoeffAndMatrix cm = i.next();
+			// ensure each element has exactly one entry that is a 1
+			System.out.println(Arrays.deepToString(cm.matrix));
+
+			for (double[] row : cm.matrix) {
+				long numNonZero = Arrays.stream(row)
+						.filter(d -> d > 0.01)
+						.count();
+				assertEquals(1, numNonZero);
+			}
+		}
+
+	}
+	
+	@Test
+	public void getMeanTest() throws BVNException {
+		double[][] m = new double[][] {
+			{0.19792615205786793, 0.19999575588922414, 0.20407645656300846, 0.19999575588922414, 0.1979261520578679},
+			{0.21218201028385858, 0.2039442351693745, 0.1979560753458031, 0.19399775745040237, 0.191990222338926},
+			{0.19397807341132017, 0.19600639437728223, 0.20000569637269275, 0.20605585711371685, 0.2039235419080274},
+			{0.20392354190802736, 0.2060558571137168, 0.2000056963726927, 0.1960063943772822, 0.1939780734113201},
+			{0.19199022233892601, 0.19399775745040237, 0.1979560753458031, 0.2039442351693745, 0.21218201028385858}
+		};
+		
+		SinkhornBalancer.balance(m);
+		double[][] mean = BVNDecomposer.meanPermutation(m);
+		
+		assertArrayEquals(new double[] {0,0,1,0,0}, mean[0], 0.01);
+		assertArrayEquals(new double[] {1,0,0,0,0}, mean[1], 0.01);
+		assertArrayEquals(new double[] {0,0,0,1,0}, mean[2], 0.01);
+		assertArrayEquals(new double[] {0,1,0,0,0}, mean[3], 0.01);
+		assertArrayEquals(new double[] {0,0,0,0,1}, mean[4], 0.01);
+
+	}
 
 
 

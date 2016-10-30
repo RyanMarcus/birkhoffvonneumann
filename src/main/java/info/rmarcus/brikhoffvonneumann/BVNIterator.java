@@ -38,6 +38,8 @@
 // < end copyright > 
 package info.rmarcus.brikhoffvonneumann;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -47,16 +49,84 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.jgrapht.UndirectedGraph;
+import org.jgrapht.WeightedGraph;
 import org.jgrapht.alg.HopcroftKarpBipartiteMatching;
+import org.jgrapht.alg.KuhnMunkresMinimalWeightBipartitePerfectMatching;
 import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleGraph;
+import org.jgrapht.graph.SimpleWeightedGraph;
 
 
 public class BVNIterator implements Iterator<CoeffAndMatrix> {
 	private final double[][] matrix;
 
 	BVNIterator(double[][] matrix) {
-		this.matrix = matrix;
+		this.matrix = new double[matrix.length][matrix[0].length];
+		for (int i = 0; i < matrix.length; i++)
+			this.matrix[i] = Arrays.copyOf(matrix[i], matrix[i].length);
+	}
+
+	/**
+	 * Returns the mean of the distribution represented by the weight matrix. the mean
+	 * returned by this method is computed by finding a maximal weight matching across the initial
+	 * weight matrix, and thus the mean returned here may not appear anywhere during iteration.
+	 * 
+	 * This method does not affect the status of the iterator, but it is affected by calls to
+	 * next(). Specifically, getMean() returns the mean of the *remaining* permutations, i.e.
+	 * the most likely permutation drawn from the weight matrix minus the permutations already
+	 * drawn.
+	 * 
+	 * @return the mean permutation
+	 */
+	public double[][] getMean() {
+		WeightedGraph<LabeledInt, DefaultWeightedEdge> g =
+				new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
+
+		// we will create a bipartite graph where the partitions are two sets
+		// of nodes, 1,2,3 for each row and column
+
+		// add 2x vertex for each value
+		Set<LabeledInt> p1 = new HashSet<>();
+		Set<LabeledInt> p2 = new HashSet<>();
+		for (int row = 0; row < matrix.length; row++) {
+			LabeledInt l1 = new LabeledInt(row, true);
+			LabeledInt l2 = new LabeledInt(row, false);
+
+			p1.add(l1); 
+			p2.add(l2);
+			g.addVertex(l1);
+			g.addVertex(l2);
+		}
+
+		// there is an edge between vertex A and vertex B iff 
+		// matrix[A][B] is non-zero. The weight of the edge is the
+		// value of the cell in the matrix.
+		for (int row = 0; row < matrix.length; row++) {
+			for (int col = 0; col < matrix[row].length; col++) {
+				// if the entry is zero, ignore it.
+				if (Math.abs(matrix[row][col] - 0) <= BVNDecomposer.EPSILON)
+					continue;
+
+				DefaultWeightedEdge de = g.addEdge(new LabeledInt(row, true), new LabeledInt(col, false));
+				// 1.0/weight because the algorithm searches for a minimal matching,
+				// but we want a maximal matching and we know all the weights will be between 0 and 1
+				g.setEdgeWeight(de, 1.0/matrix[row][col]); 
+			}
+		}
+
+		Set<DefaultWeightedEdge> matching = 
+				(new KuhnMunkresMinimalWeightBipartitePerfectMatching<LabeledInt, DefaultWeightedEdge>(g, new ArrayList<>(p1), new ArrayList<>(p2)))
+				.getMatching();
+		double[][] toR = new double[matrix.length][matrix.length];
+
+		for (DefaultWeightedEdge de : matching) {
+			int row = g.getEdgeSource(de).i;
+			int col = g.getEdgeTarget(de).i;
+			toR[row][col] = 1;
+		}
+
+		return toR;
 	}
 
 	@Override
@@ -76,13 +146,20 @@ public class BVNIterator implements Iterator<CoeffAndMatrix> {
 
 		double coeff = matrix[smallestNonZero.row][smallestNonZero.col];
 		double[][] perm = getNextPerm(smallestNonZero);
+		System.out.println(smallestNonZero + ": " + Arrays.deepToString(matrix));
 
 		// subtract coeff * perm from this.matrix
 		for (int row = 0; row < matrix.length; row++) {
 			for (int col = 0; col < matrix[row].length; col++) {
-				this.matrix[row][col] -= coeff * perm[row][col];
+				matrix[row][col] -= coeff * perm[row][col];
+
+				if (matrix[row][col] < BVNDecomposer.EPSILON)
+					matrix[row][col] = 0;
 			}
 		}
+
+		// ensure that we forced the value we selected to become zero
+		matrix[smallestNonZero.row][smallestNonZero.col] = 0;
 
 		return new CoeffAndMatrix(coeff, perm);
 	}
@@ -118,7 +195,7 @@ public class BVNIterator implements Iterator<CoeffAndMatrix> {
 				if ((Math.abs(matrix[row][col] - 0) <= BVNDecomposer.EPSILON)
 						|| (row == edgeToForce.row && col != edgeToForce.col))
 					continue;
-				
+
 				g.addEdge(new LabeledInt(row, true), new LabeledInt(col, false));
 
 			}
@@ -170,7 +247,11 @@ public class BVNIterator implements Iterator<CoeffAndMatrix> {
 
 			LabeledInt oi = (LabeledInt) o;
 			return oi.i == i && oi.label == label;
+		}
 
+		@Override
+		public String toString() {
+			return "(" + i + ", " + label + ")";
 		}
 	}
 

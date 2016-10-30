@@ -22,6 +22,8 @@ package info.rmarcus.brikhoffvonneumann.learners;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
+
 import org.junit.Test;
 
 import info.rmarcus.brikhoffvonneumann.SinkhornBalancer;
@@ -41,14 +43,17 @@ public class PermELearnTest {
 			{4, 3, 2, 1, 0}
 		};
 
-		SinkhornBalancer.normalize(lossMatrix, toSort.length);
+		SinkhornBalancer.normalize(lossMatrix, 1);
 
-		PermELearn pel = new PermELearn(toSort.length, 0.5);
+		System.out.println(Arrays.deepToString(lossMatrix));
+		
+		PermELearn pel = new PermELearn(toSort.length, 0.05);
 		for (int i = 0; i < 100; i++) {
 			pel.updateWeights(lossMatrix);
 		}
 
 		double[][] mean = pel.getMeanPermutation();
+
 		assertArrayEquals(new double[] {0,0,1,0,0}, mean[0], 0.01);
 		assertArrayEquals(new double[] {1,0,0,0,0}, mean[1], 0.01);
 		assertArrayEquals(new double[] {0,0,0,1,0}, mean[2], 0.01);
@@ -56,7 +61,7 @@ public class PermELearnTest {
 		assertArrayEquals(new double[] {0,0,0,0,1}, mean[4], 0.01);
 
 		assertEquals(0, PermELearn.calculateLoss(mean, lossMatrix), 0.01);
-
+		
 	}
 
 }

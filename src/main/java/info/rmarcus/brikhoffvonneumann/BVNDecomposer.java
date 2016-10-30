@@ -48,7 +48,7 @@ import info.rmarcus.brikhoffvonneumann.exceptions.BVNNonSquareMatrixException;
  *
  */
 public class BVNDecomposer {
-	static final double EPSILON = 0.0001;
+	static final double EPSILON = 0.00001;
 
 	private BVNDecomposer() {}
 	
@@ -118,11 +118,8 @@ public class BVNDecomposer {
 	 * @throws BVNException
 	 */
 	public static double[][] meanPermutation(double[][] matrix) throws BVNException {
-		Iterator<CoeffAndMatrix> i = decomposeBistocastic(matrix);
-		return StreamUtils.asStream(i)
-				.max((a, b) -> (int)Math.signum(a.coeff - b.coeff))
-				.map(c -> c.matrix)
-				.orElse(null);
+		return ((BVNIterator)decomposeBistocastic(matrix)).getMean();
+
 	}
 	
 	
