@@ -19,6 +19,7 @@
 // < end copyright > 
 package info.rmarcus.brikhoffvonneumann.learners;
 
+import java.util.Arrays;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -129,26 +130,21 @@ public class PermELearn {
 		
 		for (int i = 0; i < lossMatrix.length; i++) {
 			for (int j = 0; j < lossMatrix[i].length; j++) {
-				lossMatrix[i][j] = toSort[i] * (j+1);
+				lossMatrix[i][j] = toSort[i] * (1.0 / (j+1));
 			}
 		}
 		
-		lossMatrix = new double[][] {
-			{2, 1, 0, 1, 2},
-			{0, 1, 2, 3, 4},
-			{3, 2, 1, 0, 1},
-			{1, 0, 1, 2, 3},
-			{4, 3, 2, 1, 0}
-		};
 		
-		SinkhornBalancer.normalize(lossMatrix, toSort.length);
-		
+		SinkhornBalancer.normalize(lossMatrix, 1);
+
+		System.out.println(Arrays.deepToString(lossMatrix));
 		
 		PermELearn pel = new PermELearn(toSort.length, 0.5);
 		for (int i = 0; i < 100; i++) {
 			pel.iterateAndUpdateWeights(lossMatrix);
 		}
 		
+		System.out.println(Arrays.deepToString(pel.getMeanPermutation()));
 	}
 
 

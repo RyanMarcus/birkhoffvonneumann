@@ -22,6 +22,8 @@ package info.rmarcus.brikhoffvonneumann.learners;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
+
 import org.junit.Test;
 
 import info.rmarcus.brikhoffvonneumann.SinkhornBalancer;
@@ -29,7 +31,7 @@ import info.rmarcus.brikhoffvonneumann.SinkhornBalancer;
 public class PermELearnTest {
 
 	@Test
-	public void learnsSortedOrder() {
+	public void learnsSortedOrderTest() {
 		double[] toSort = new double[] {5, 1, 8, 3, 9};
 		double[][] lossMatrix;
 
@@ -45,7 +47,7 @@ public class PermELearnTest {
 
 		
 		PermELearn pel = new PermELearn(toSort.length, 0.05);
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < 5; i++) {
 			pel.updateWeights(lossMatrix);
 		}
 
@@ -59,6 +61,34 @@ public class PermELearnTest {
 
 		assertEquals(0, PermELearn.calculateLoss(mean, lossMatrix), 0.01);
 		
+	}
+	
+	@Test
+	public void learnsSortedOrderAltLossTest() {
+		double[] toSort = new double[] {5, 1, 8, 3, 9};
+		double[][] lossMatrix = new double[5][5];
+		
+		for (int i = 0; i < lossMatrix.length; i++) {
+			for (int j = 0; j < lossMatrix[i].length; j++) {
+				lossMatrix[i][j] = toSort[i] * (1.0/(j+1));
+			}
+		}
+		
+		SinkhornBalancer.normalize(lossMatrix, 1);
+		
+		PermELearn pel = new PermELearn(toSort.length, 0.05);
+		for (int i = 0; i < 5; i++) {
+			pel.updateWeights(lossMatrix);
+		}
+		
+
+		double[][] mean = pel.getMeanPermutation();
+
+		assertArrayEquals(new double[] {0,0,1,0,0}, mean[0], 0.01);
+		assertArrayEquals(new double[] {1,0,0,0,0}, mean[1], 0.01);
+		assertArrayEquals(new double[] {0,0,0,1,0}, mean[2], 0.01);
+		assertArrayEquals(new double[] {0,1,0,0,0}, mean[3], 0.01);
+		assertArrayEquals(new double[] {0,0,0,0,1}, mean[4], 0.01);
 	}
 
 }
