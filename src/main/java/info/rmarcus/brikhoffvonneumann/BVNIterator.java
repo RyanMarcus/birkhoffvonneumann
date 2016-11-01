@@ -105,22 +105,27 @@ public class BVNIterator implements Iterator<CoeffAndMatrix> {
 		for (int row = 0; row < matrix.length; row++) {
 			for (int col = 0; col < matrix[row].length; col++) {
 				// if the entry is zero, ignore it.
-				if (Math.abs(matrix[row][col] - 0) <= BVNDecomposer.EPSILON)
-					continue;
-
 				DefaultWeightedEdge de = g.addEdge(new LabeledInt(row, true), new LabeledInt(col, false));
-				// 1.0/weight because the algorithm searches for a minimal matching,
-				// but we want a maximal matching and we know all the weights will be between 0 and 1
-				g.setEdgeWeight(de, 1.0/matrix[row][col]); 
+
+				if (Math.abs(matrix[row][col] - 0) <= BVNDecomposer.EPSILON) {
+					g.setEdgeWeight(de, Double.MAX_VALUE);
+				} else {
+					// 1.0/weight because the algorithm searches for a minimal matching,
+					// but we want a maximal matching and we know all the weights will be between 0 and 1
+					g.setEdgeWeight(de, 1.0/matrix[row][col]);
+				}
 			}
 		}
-
+		
 		Set<DefaultWeightedEdge> matching = 
 				(new KuhnMunkresMinimalWeightBipartitePerfectMatching<LabeledInt, DefaultWeightedEdge>(g, new ArrayList<>(p1), new ArrayList<>(p2)))
 				.getMatching();
 		double[][] toR = new double[matrix.length][matrix.length];
-
+		
 		for (DefaultWeightedEdge de : matching) {
+			if (Math.abs(g.getEdgeWeight(de) - 0) < BVNDecomposer.EPSILON)
+				continue;
+			
 			int row = g.getEdgeSource(de).i;
 			int col = g.getEdgeTarget(de).i;
 			toR[row][col] = 1;
@@ -136,31 +141,57 @@ public class BVNIterator implements Iterator<CoeffAndMatrix> {
 
 	@Override
 	public CoeffAndMatrix next() {
-		// we could do this with orElseThrow, but SonarLint doesn't recognize that
-		Optional<Index> smallestNonZeroOpt = findSmallestNonZero(matrix);
-
-		if (!smallestNonZeroOpt.isPresent())
+//		// we could do this with orElseThrow, but SonarLint doesn't recognize that
+//		Optional<Index> smallestNonZeroOpt = findSmallestNonZero(matrix);
+//
+//		if (!smallestNonZeroOpt.isPresent())
+//			throw new NoSuchElementException();
+//
+//		Index smallestNonZero = smallestNonZeroOpt.get();
+//
+//		double coeff = matrix[smallestNonZero.row][smallestNonZero.col];
+//		double[][] perm = getNextPerm(smallestNonZero);
+//
+//		// subtract coeff * perm from this.matrix
+//		for (int row = 0; row < matrix.length; row++) {
+//			for (int col = 0; col < matrix[row].length; col++) {
+//				matrix[row][col] -= coeff * perm[row][col];
+//
+//				if (matrix[row][col] < BVNDecomposer.EPSILON)
+//					matrix[row][col] = 0;
+//			}
+//		}
+//
+//		// ensure that we forced the value we selected to become zero
+//		matrix[smallestNonZero.row][smallestNonZero.col] = 0;
+//
+//		return new CoeffAndMatrix(coeff, perm);
+		
+		if (!hasNext())
 			throw new NoSuchElementException();
-
-		Index smallestNonZero = smallestNonZeroOpt.get();
-
-		double coeff = matrix[smallestNonZero.row][smallestNonZero.col];
-		double[][] perm = getNextPerm(smallestNonZero);
-
-		// subtract coeff * perm from this.matrix
-		for (int row = 0; row < matrix.length; row++) {
-			for (int col = 0; col < matrix[row].length; col++) {
-				matrix[row][col] -= coeff * perm[row][col];
-
-				if (matrix[row][col] < BVNDecomposer.EPSILON)
-					matrix[row][col] = 0;
+		
+		double[][] mean = getMean();
+		Set<Double> coeffsInMean = new HashSet<>();
+		for (int i = 0; i < matrix.length; i++) {
+			for (int j = 0; j < matrix[i].length; j++) {
+				if (mean[i][j] > 0.0)
+					coeffsInMean.add(matrix[i][j]);
 			}
 		}
+		double coeff = coeffsInMean.stream().mapToDouble(d -> d).min().getAsDouble();
 
-		// ensure that we forced the value we selected to become zero
-		matrix[smallestNonZero.row][smallestNonZero.col] = 0;
-
-		return new CoeffAndMatrix(coeff, perm);
+		for (int i = 0; i < matrix.length; i++) {
+			for (int j = 0; j < matrix[i].length; j++) {
+				matrix[i][j] -= mean[i][j] * coeff;
+				if (matrix[i][j] < BVNDecomposer.EPSILON)
+					matrix[i][j] = 0;
+			}
+		}
+		
+		return new CoeffAndMatrix(coeff, mean);
+		
+		
+		
 	}
 
 	private double[][] getNextPerm(Index edgeToForce) {
