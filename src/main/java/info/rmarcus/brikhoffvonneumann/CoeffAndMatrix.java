@@ -41,6 +41,8 @@ package info.rmarcus.brikhoffvonneumann;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.jdt.annotation.Nullable;
+
 public class CoeffAndMatrix {
 	public final double coeff;
 	public final double[][] matrix;
@@ -51,11 +53,15 @@ public class CoeffAndMatrix {
 	}
 	
 	public Set<Swap> asSwaps() {
+		return CoeffAndMatrix.asSwaps(matrix);
+	}
+	
+	public static Set<Swap> asSwaps(double[][] permutation) {
 		Set<Swap> toR = new HashSet<>();
 		
-		for (int i = 0; i < matrix.length; i++) {
-			for (int j = 0; j < matrix[i].length; j++) {
-				if (matrix[i][j] > 0) {
+		for (int i = 0; i < permutation.length; i++) {
+			for (int j = 0; j < permutation[i].length; j++) {
+				if (permutation[i][j] > 0) {
 					toR.add(new Swap(i, j));
 					break;
 				}
@@ -65,7 +71,7 @@ public class CoeffAndMatrix {
 		return toR;
 	}
 	
-	public class Swap {
+	public static class Swap {
 		private final int origPos;
 		private final int newPos;
 		private Swap(int o, int n) {
@@ -87,7 +93,7 @@ public class CoeffAndMatrix {
 		}
 		
 		@Override
-		public boolean equals(Object o) {
+		public boolean equals(@Nullable Object o) {
 			if (!(o instanceof Swap))
 				return false;
 			

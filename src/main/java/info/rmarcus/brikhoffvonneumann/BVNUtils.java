@@ -30,30 +30,36 @@ import info.rmarcus.brikhoffvonneumann.exceptions.BVNNonSquareMatrixException;
 import info.rmarcus.brikhoffvonneumann.learners.PermELearn;
 
 class BVNUtils {
+	
+	@SuppressWarnings("null")
 	private static final Logger l = Logger.getLogger(PermELearn.class.getName());
 
 	private BVNUtils() {
-		
+
 	}
-	
+
 	static void checkSquare(double[][] matrix) throws BVNNonSquareMatrixException {
 		// check to make sure the matrix is square
 		int matrixHeight = matrix.length;
 		if (Arrays.stream(matrix).anyMatch(row -> row.length != matrixHeight))
 			throw new BVNNonSquareMatrixException();
 	}
-	
+
 	static void checkMatrixInput(double[][] matrix) throws BVNNonSquareMatrixException, BVNNonBistochasticMatrixException {
-		
+
 		checkSquare(matrix);
 		
+		if (!isNonNeg(matrix))
+			throw new BVNNonBistochasticMatrixException();
+		
+
 		// check to make sure the matrix is bistochastic.
 		// first, check the row sums.
 		if (Arrays.stream(matrix)
 				.map(row -> Arrays.stream(row).sum())
 				.anyMatch(d -> Math.abs(1.0 - d) > BVNDecomposer.EPSILON))
 			throw new BVNNonBistochasticMatrixException();
-		
+
 		// next, check the column sums
 		if (IntStream.range(0, matrix.length).mapToDouble(i -> {
 			double collector = 0.0;
@@ -62,8 +68,16 @@ class BVNUtils {
 			return collector;
 		}).anyMatch(d -> Math.abs(1 - d) > BVNDecomposer.EPSILON))
 			throw new BVNNonBistochasticMatrixException();
+
 	}
-	
+
+	static boolean isNonNeg(double[][] matrix) {
+		// check for non-neg
+		return !(Arrays.stream(matrix)
+				.flatMapToDouble(d -> Arrays.stream(d))
+				.anyMatch(p -> p < 0));
+	}
+
 	static boolean isBistochastic(double[][] matrix) {
 		try {
 			checkMatrixInput(matrix);

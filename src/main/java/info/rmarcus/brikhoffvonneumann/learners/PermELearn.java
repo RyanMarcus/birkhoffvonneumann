@@ -27,11 +27,11 @@ import java.util.logging.Logger;
 import info.rmarcus.brikhoffvonneumann.BVNDecomposer;
 import info.rmarcus.brikhoffvonneumann.SinkhornBalancer;
 import info.rmarcus.brikhoffvonneumann.exceptions.BVNException;
-import info.rmarcus.brikhoffvonneumann.exceptions.BVNNonSquareMatrixException;
 import info.rmarcus.brikhoffvonneumann.exceptions.BVNRuntimeException;
 
 public class PermELearn {
 
+	@SuppressWarnings("null")
 	private static final Logger l = Logger.getLogger(PermELearn.class.getName());
 
 	private double[][] w;
@@ -96,7 +96,7 @@ public class PermELearn {
 		
 		try {
 			SinkhornBalancer.balance(w);
-		} catch (BVNNonSquareMatrixException e) {
+		} catch (BVNException e) {
 			l.log(Level.WARNING, "Error in updateWeights", e);
 			throw new BVNRuntimeException("error while updating weight matrix: " + e.getMessage());
 		}

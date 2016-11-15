@@ -45,9 +45,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.jgrapht.UndirectedGraph;
 import org.jgrapht.WeightedGraph;
 import org.jgrapht.alg.HopcroftKarpBipartiteMatching;
@@ -57,14 +59,20 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleGraph;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
+import info.rmarcus.NullUtils;
+import info.rmarcus.brikhoffvonneumann.exceptions.BVNRuntimeException;
+
 
 public class BVNIterator implements Iterator<CoeffAndMatrix> {
 	private final double[][] matrix;
+	private final DecompositionType type;
 
-	BVNIterator(double[][] matrix) {
+	BVNIterator(double[][] matrix, DecompositionType t) {
 		this.matrix = new double[matrix.length][matrix[0].length];
 		for (int i = 0; i < matrix.length; i++)
 			this.matrix[i] = Arrays.copyOf(matrix[i], matrix[i].length);
+		
+		type = t;
 	}
 
 	/**
@@ -80,73 +88,40 @@ public class BVNIterator implements Iterator<CoeffAndMatrix> {
 	 * @return the mean permutation
 	 */
 	public double[][] getMean() {
-		WeightedGraph<LabeledInt, DefaultWeightedEdge> g =
-				new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
-
-		// we will create a bipartite graph where the partitions are two sets
-		// of nodes, 1,2,3 for each row and column
-
-		// add 2x vertex for each value
-		Set<LabeledInt> p1 = new HashSet<>();
-		Set<LabeledInt> p2 = new HashSet<>();
-		for (int row = 0; row < matrix.length; row++) {
-			LabeledInt l1 = new LabeledInt(row, true);
-			LabeledInt l2 = new LabeledInt(row, false);
-
-			p1.add(l1); 
-			p2.add(l2);
-			g.addVertex(l1);
-			g.addVertex(l2);
-		}
-
-		// there is an edge between vertex A and vertex B iff 
-		// matrix[A][B] is non-zero. The weight of the edge is the
-		// value of the cell in the matrix.
-		for (int row = 0; row < matrix.length; row++) {
-			for (int col = 0; col < matrix[row].length; col++) {
-				// if the entry is zero, ignore it.
-				if (Math.abs(matrix[row][col] - 0) <= BVNDecomposer.EPSILON)
-					continue;
-
-				DefaultWeightedEdge de = g.addEdge(new LabeledInt(row, true), new LabeledInt(col, false));
-				// 1.0/weight because the algorithm searches for a minimal matching,
-				// but we want a maximal matching and we know all the weights will be between 0 and 1
-				g.setEdgeWeight(de, 1.0/matrix[row][col]); 
-			}
-		}
-
-		Set<DefaultWeightedEdge> matching = 
-				(new KuhnMunkresMinimalWeightBipartitePerfectMatching<LabeledInt, DefaultWeightedEdge>(g, new ArrayList<>(p1), new ArrayList<>(p2)))
-				.getMatching();
-		double[][] toR = new double[matrix.length][matrix.length];
-
-		for (DefaultWeightedEdge de : matching) {
-			int row = g.getEdgeSource(de).i;
-			int col = g.getEdgeTarget(de).i;
-			toR[row][col] = 1;
-		}
-
-		return toR;
+		return getNextPermGreedy();
 	}
 
 	@Override
 	public boolean hasNext() {
-		return findSmallestNonZero(matrix).isPresent();
+		return findSmallestNonZero(matrix) != null;
 	}
 
 	@Override
+	@NonNull
 	public CoeffAndMatrix next() {
-		// we could do this with orElseThrow, but SonarLint doesn't recognize that
-		Optional<Index> smallestNonZeroOpt = findSmallestNonZero(matrix);
-
-		if (!smallestNonZeroOpt.isPresent())
-			throw new NoSuchElementException();
-
-		Index smallestNonZero = smallestNonZeroOpt.get();
-
-		double coeff = matrix[smallestNonZero.row][smallestNonZero.col];
-		double[][] perm = getNextPerm(smallestNonZero);
-
+		final Supplier<double[][]> nextFunc;
+		switch (type) {
+		case BVN:
+			nextFunc = this::getNextPermBVN;
+			break;
+		case GREEDY:
+			nextFunc = this::getNextPermGreedy;
+			break;
+		case PERFECT:
+			throw new BVNRuntimeException("Not yet implemented!"); //TODO
+		default:
+			throw new BVNRuntimeException("Not yet implemented!"); //TODO
+		}
+		
+		double[][] perm = nextFunc.get();
+		double[][] tmp = new double[perm.length][perm.length];
+		MatrixUtils.multiply(tmp, matrix, perm);
+		
+		double coeff = Arrays.stream(tmp)
+				.flatMapToDouble(Arrays::stream)
+				.filter(d -> d > BVNDecomposer.EPSILON)
+				.min().orElseThrow(NoSuchElementException::new);
+		
 		// subtract coeff * perm from this.matrix
 		for (int row = 0; row < matrix.length; row++) {
 			for (int col = 0; col < matrix[row].length; col++) {
@@ -157,13 +132,12 @@ public class BVNIterator implements Iterator<CoeffAndMatrix> {
 			}
 		}
 
-		// ensure that we forced the value we selected to become zero
-		matrix[smallestNonZero.row][smallestNonZero.col] = 0;
-
 		return new CoeffAndMatrix(coeff, perm);
 	}
 
-	private double[][] getNextPerm(Index edgeToForce) {
+	private double[][] getNextPermBVN() {
+		Index edgeToForce = NullUtils.orThrow(findSmallestNonZero(matrix), () -> new NoSuchElementException());
+
 		UndirectedGraph<LabeledInt, DefaultEdge> g =
 				new SimpleGraph<>(DefaultEdge.class);
 
@@ -204,15 +178,77 @@ public class BVNIterator implements Iterator<CoeffAndMatrix> {
 		double[][] toR = new double[matrix.length][matrix.length];
 
 		for (DefaultEdge de : matching) {
-			int row = g.getEdgeSource(de).i;
-			int col = g.getEdgeTarget(de).i;
+			int row = NullUtils.orThrow(g.getEdgeSource(de), () -> new BVNRuntimeException("Null row value in matching")).i;
+			int col = NullUtils.orThrow(g.getEdgeTarget(de), () -> new BVNRuntimeException("Null col value in matching")).i;
+			toR[row][col] = 1;
+		}
+
+		return toR;
+	}
+	
+	private double[][] getNextPermGreedy() {
+		WeightedGraph<@Nullable LabeledInt, @Nullable DefaultWeightedEdge> g =
+				new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
+
+		// we will create a bipartite graph where the partitions are two sets
+		// of nodes, 1,2,3 for each row and column
+
+		// add 2x vertex for each value
+		Set<LabeledInt> p1 = new HashSet<>();
+		Set<LabeledInt> p2 = new HashSet<>();
+		for (int row = 0; row < matrix.length; row++) {
+			LabeledInt l1 = new LabeledInt(row, true);
+			LabeledInt l2 = new LabeledInt(row, false);
+
+			p1.add(l1); 
+			p2.add(l2);
+			g.addVertex(l1);
+			g.addVertex(l2);
+		}
+
+		// there is an edge between vertex A and vertex B iff 
+		// matrix[A][B] is non-zero. The weight of the edge is the
+		// value of the cell in the matrix.
+		for (int row = 0; row < matrix.length; row++) {
+			for (int col = 0; col < matrix[row].length; col++) {
+				DefaultWeightedEdge de = g.addEdge(new LabeledInt(row, true), new LabeledInt(col, false));
+
+				// 1.0/weight because the algorithm searches for a minimal matching,
+				// but we want a maximal matching and we know all the weights will be between 0 and 1
+				
+				// if the entry is zero, ignore it.
+				if (Math.abs(matrix[row][col] - 0) <= BVNDecomposer.EPSILON) {
+					g.setEdgeWeight(de, Double.MAX_VALUE);
+				} else {
+					g.setEdgeWeight(de, 1.0/matrix[row][col]); 
+				}
+				
+				
+			}
+		}
+		
+		
+		@Nullable Set<@Nullable DefaultWeightedEdge> matching = 
+				(new KuhnMunkresMinimalWeightBipartitePerfectMatching<@Nullable LabeledInt, @Nullable DefaultWeightedEdge>(g, new ArrayList<>(p1), new ArrayList<>(p2)))
+				.getMatching();
+		
+		if (matching == null) {
+			throw new BVNRuntimeException("Unable to compute matching");
+		}
+		
+		double[][] toR = new double[matrix.length][matrix.length];
+
+		for (DefaultWeightedEdge de : matching) {
+			int row = NullUtils.orThrow(g.getEdgeSource(de), () -> new BVNRuntimeException("Null row value in matching")).i;
+			int col = NullUtils.orThrow(g.getEdgeTarget(de), () -> new BVNRuntimeException("Null col value in matching")).i;
 			toR[row][col] = 1;
 		}
 
 		return toR;
 	}
 
-	private Optional<Index> findSmallestNonZero(double[][] matrix) {
+	@Nullable
+	private Index findSmallestNonZero(double[][] matrix) {
 		Map<Index, Double> nonZeros = new HashMap<>();
 		for (int row = 0; row < matrix.length; row++) {
 			for (int col = 0; col < matrix[row].length; col++) {
@@ -220,9 +256,15 @@ public class BVNIterator implements Iterator<CoeffAndMatrix> {
 					nonZeros.put(new Index(row, col), matrix[row][col]);
 			}
 		}
-
-		return nonZeros.keySet().stream()
-				.min((a, b) -> (int)Math.signum(nonZeros.get(a) - nonZeros.get(b)));
+		
+		return NullUtils.deoptional(nonZeros.keySet().stream()
+				.min((a, b) -> (int)Math.signum(
+						NullUtils.orThrow(nonZeros.get(a), () -> new BVNRuntimeException("Keyset object no longer in map!"))
+						-
+						NullUtils.orThrow(nonZeros.get(b), () -> new BVNRuntimeException("Keyset object no longer in map!")))));
+		
+		
+				
 	}
 
 	private class LabeledInt {
@@ -240,8 +282,8 @@ public class BVNIterator implements Iterator<CoeffAndMatrix> {
 		}
 
 		@Override
-		public boolean equals(Object o) {
-			if (!(o instanceof LabeledInt))
+		public boolean equals(@Nullable Object o) {
+			if (o == null || !(o instanceof LabeledInt))
 				return false;
 
 			LabeledInt oi = (LabeledInt) o;

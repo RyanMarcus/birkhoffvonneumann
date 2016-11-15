@@ -23,13 +23,13 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import info.rmarcus.brikhoffvonneumann.exceptions.BVNNonBistochasticMatrixException;
+import info.rmarcus.brikhoffvonneumann.exceptions.BVNException;
 import info.rmarcus.brikhoffvonneumann.exceptions.BVNNonSquareMatrixException;
 
 public class SinkhornBalancerTest {
 
 	@Test
-	public void test1() throws BVNNonSquareMatrixException, BVNNonBistochasticMatrixException {
+	public void test1() throws BVNNonSquareMatrixException, BVNException {
 		double[][] matrix = new double[][] { {3, 2, 1}, {2, 1, 3}, {1, 2, 3} };
 		SinkhornBalancer.balance(matrix);
 		

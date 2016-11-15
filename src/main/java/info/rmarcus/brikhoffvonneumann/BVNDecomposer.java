@@ -40,8 +40,13 @@ package info.rmarcus.brikhoffvonneumann;
 
 import java.util.Iterator;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
+
+import info.rmarcus.NullUtils;
 import info.rmarcus.brikhoffvonneumann.exceptions.BVNException;
 import info.rmarcus.brikhoffvonneumann.exceptions.BVNNonSquareMatrixException;
+import info.rmarcus.brikhoffvonneumann.exceptions.BVNRuntimeException;
 
 /**
  * A class to produce Brikhoff von-Neumann decompositions of bistochastic matrices
@@ -51,6 +56,18 @@ public class BVNDecomposer {
 	static final double EPSILON = 0.00001;
 
 	private BVNDecomposer() {}
+	
+
+	/**
+	 * Uses the BVN decomposition type.
+	 * 
+	 * @param matrix the input matrix
+	 * @return an iterator using the BVN decomposition type
+	 * @throws BVNException
+	 */
+	public static Iterator<CoeffAndMatrix> decomposeBistocastic(double@Nullable[][] matrix) throws BVNException {
+		return decomposeBistocastic(matrix, DecompositionType.BVN);
+	}
 	
 	/**
 	 * Produces a decomposition. The input matrix must be square and bistochastic.
@@ -69,15 +86,16 @@ public class BVNDecomposer {
 	 * 
 	 * 
 	 * @param matrix the input matrix
+	 * @param type the type of decomposition to perform
 	 * @return an iterator over the permutations that compose the input matrix.
 	 * @throws BVNException if the matrix is not square or if the matrix is not bistochastic
 	 */
-	public static Iterator<CoeffAndMatrix> decomposeBistocastic(double[][] matrix) throws BVNException {
+	public static Iterator<@NonNull CoeffAndMatrix> decomposeBistocastic(double@Nullable[][] matrix, DecompositionType type) throws BVNException {
 		if (matrix == null) {
 			throw new BVNNonSquareMatrixException();
 		}
 		BVNUtils.checkMatrixInput(matrix);
-		return new BVNIterator(matrix);
+		return new BVNIterator(matrix, type);
 	}
 	
 	/**
@@ -90,23 +108,43 @@ public class BVNDecomposer {
 	 * @throws BVNException if the matrix is not square, bistochastic, or r is not between 0 and 1
 	 */
 	public static double[][] sample(double r, double[][] matrix) throws BVNException {
+		
+		Iterator<CoeffAndMatrix> i = sampleUntil(r, matrix);
+		@Nullable CoeffAndMatrix cam = null;
+		while (i.hasNext())
+			cam = i.next();
+		
+		if (cam == null) 
+			throw new BVNException("Could not sample up to " + r + " density.");
+			
+		return cam.matrix;
+			
+	}
+	
+	public static Iterator<CoeffAndMatrix> sampleUntil(double r, double[][] matrix) throws BVNException {
 		if (r < 0.0 || r > 1.0)
 			throw new BVNException("r must be between 0 and 1!");
 		
-		double rLeft = r;
-		Iterator<CoeffAndMatrix> i = decomposeBistocastic(matrix);
-		
-		CoeffAndMatrix candidate;
-		do {
-			candidate = i.next();
+		return new Iterator<CoeffAndMatrix>() {
+			double left = r;
+			final Iterator<CoeffAndMatrix> i = decomposeBistocastic(matrix);
 			
-			if (!i.hasNext())
-				return candidate.matrix;
 			
-			rLeft -= candidate.coeff;
-		} while (rLeft > 0);
+			@Override
+			public boolean hasNext() {
+				return left > 0;
+			}
+
+			@Override
+			public CoeffAndMatrix next() {
+				CoeffAndMatrix toR = NullUtils.orThrow(i.next(), () -> new BVNRuntimeException("Got a null value from the decomposition iterator!"));
+				left -= toR.coeff;
+				return toR;
+			}
 		
-		return candidate.matrix;
+		};
+		
+		
 	}
 	
 	/**
@@ -121,6 +159,8 @@ public class BVNDecomposer {
 		return ((BVNIterator)decomposeBistocastic(matrix)).getMean();
 
 	}
+
+
 	
 	
 }
