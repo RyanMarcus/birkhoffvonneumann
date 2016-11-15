@@ -27,10 +27,12 @@ public class CentralizedLA {
 	private Random r = new Random(30);
 	private double@Nullable[][] best = null;
 	private double bestVal = Double.MAX_VALUE;
+	private BVNDecomposer bvn;
 
 	public CentralizedLA(int numItems, double learningRate) {
 		w = new double[numItems][numItems];
 		this.learningRate = learningRate;
+		this.bvn = new BVNDecomposer();
 
 		// initialize our random guess where all permutations are equally likely
 		for (int i = 0; i < w.length; i++)
@@ -40,7 +42,7 @@ public class CentralizedLA {
 
 	public void iterate(ToDoubleFunction<double[][]> lossFunc) {
 		try {
-			double[][] sample = BVNDecomposer.sample(r.nextDouble(), w);
+			double[][] sample = bvn.sample(r.nextDouble(), w);
 			double reward = 1.0 - lossFunc.applyAsDouble(sample);
 			Set<Swap> swaps = CoeffAndMatrix.asSwaps(sample);
 			

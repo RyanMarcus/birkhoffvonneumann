@@ -37,10 +37,12 @@ public class PermELearn {
 	private double[][] w;
 	private double learningRate;
 	private Random r = new Random(30);
+	private BVNDecomposer bvn;
 
 	public PermELearn(int numItems, double learningRate) {
 		w = new double[numItems][numItems];
 		this.learningRate = learningRate;
+		this.bvn = new BVNDecomposer();
 
 		// initialize our random guess where all permutations are equally likely
 		for (int i = 0; i < w.length; i++)
@@ -52,7 +54,7 @@ public class PermELearn {
 		checkLossMatrix(lossMatrix);
 		try {
 			// create a sample from our current weight matrix
-			double[][] sample = BVNDecomposer.sample(r.nextDouble(), w);
+			double[][] sample = bvn.sample(r.nextDouble(), w);
 			updateWeights(lossMatrix);
 
 			return sample;
@@ -81,7 +83,7 @@ public class PermELearn {
 	
 	public double[][] getMeanPermutation() {
 		try {
-			return BVNDecomposer.meanPermutation(w);
+			return bvn.meanPermutation(w);
 		} catch (BVNException e) {
 			l.log(Level.WARNING, "Error in getMeanPermutation", e);
 			throw new BVNRuntimeException("error while getting mean permutation: " + e.getMessage());

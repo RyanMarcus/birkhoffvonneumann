@@ -54,20 +54,17 @@ import info.rmarcus.brikhoffvonneumann.exceptions.BVNRuntimeException;
  */
 public class BVNDecomposer {
 	static final double EPSILON = 0.00001;
-
-	private BVNDecomposer() {}
+	private final DecompositionType type;
+	
+	public BVNDecomposer() {
+		type = DecompositionType.BVN;
+	}
+	
+	public BVNDecomposer(DecompositionType type) {
+		this.type = type;
+	}
 	
 
-	/**
-	 * Uses the BVN decomposition type.
-	 * 
-	 * @param matrix the input matrix
-	 * @return an iterator using the BVN decomposition type
-	 * @throws BVNException
-	 */
-	public static Iterator<CoeffAndMatrix> decomposeBistocastic(double@Nullable[][] matrix) throws BVNException {
-		return decomposeBistocastic(matrix, DecompositionType.BVN);
-	}
 	
 	/**
 	 * Produces a decomposition. The input matrix must be square and bistochastic.
@@ -86,11 +83,10 @@ public class BVNDecomposer {
 	 * 
 	 * 
 	 * @param matrix the input matrix
-	 * @param type the type of decomposition to perform
 	 * @return an iterator over the permutations that compose the input matrix.
 	 * @throws BVNException if the matrix is not square or if the matrix is not bistochastic
 	 */
-	public static Iterator<@NonNull CoeffAndMatrix> decomposeBistocastic(double@Nullable[][] matrix, DecompositionType type) throws BVNException {
+	public Iterator<@NonNull CoeffAndMatrix> decomposeBistocastic(double@Nullable[][] matrix) throws BVNException {
 		if (matrix == null) {
 			throw new BVNNonSquareMatrixException();
 		}
@@ -107,7 +103,7 @@ public class BVNDecomposer {
 	 * @return a sample permutation from the matrix
 	 * @throws BVNException if the matrix is not square, bistochastic, or r is not between 0 and 1
 	 */
-	public static double[][] sample(double r, double[][] matrix) throws BVNException {
+	public double[][] sample(double r, double[][] matrix) throws BVNException {
 		
 		Iterator<CoeffAndMatrix> i = sampleUntil(r, matrix);
 		@Nullable CoeffAndMatrix cam = null;
@@ -121,7 +117,7 @@ public class BVNDecomposer {
 			
 	}
 	
-	public static Iterator<CoeffAndMatrix> sampleUntil(double r, double[][] matrix) throws BVNException {
+	public Iterator<CoeffAndMatrix> sampleUntil(double r, double[][] matrix) throws BVNException {
 		if (r < 0.0 || r > 1.0)
 			throw new BVNException("r must be between 0 and 1!");
 		
@@ -155,9 +151,8 @@ public class BVNDecomposer {
 	 * @return the permutation with the largest coeff
 	 * @throws BVNException
 	 */
-	public static double[][] meanPermutation(double[][] matrix) throws BVNException {
+	public double[][] meanPermutation(double[][] matrix) throws BVNException {
 		return ((BVNIterator)decomposeBistocastic(matrix)).getMean();
-
 	}
 
 
