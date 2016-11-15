@@ -87,4 +87,11 @@ class BVNUtils {
 			return false;
 		}
 	}
+	
+	static void printMatrix(double[][] matrix) {
+		for (double[] d : matrix) {
+			System.out.println(Arrays.toString(d));
+		}
+		System.out.println("---");
+	}
 }

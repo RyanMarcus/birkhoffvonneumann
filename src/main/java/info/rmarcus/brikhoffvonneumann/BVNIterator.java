@@ -129,10 +129,13 @@ public class BVNIterator implements Iterator<CoeffAndMatrix> {
 
 				if (matrix[row][col] < BVNDecomposer.EPSILON)
 					matrix[row][col] = 0;
+
 			}
 		}
 
+
 		return new CoeffAndMatrix(coeff, perm);
+
 	}
 
 	private double[][] getNextPermBVN() {

@@ -115,15 +115,19 @@ public class BVNDecomposerTest {
 
 	@Test
 	public void decompExpiresAfterTwoTest() throws BVNException {
-		Iterator<CoeffAndMatrix> i = BVNDecomposer.decomposeBistocastic(new double[][] {{0.5, 0, 0.5}, {0, 1, 0}, {0.5,0,0.5} });
+		Iterator<CoeffAndMatrix> i = BVNDecomposer.decomposeBistocastic(new double[][] {
+			{0.5, 0, 0.5},
+			{0,   1, 0  },
+			{0.5, 0, 0.5} 
+			});
 
 		assertTrue(i.hasNext());
 		CoeffAndMatrix cam = NullUtils.orThrow(i.next(), () -> new BVNRuntimeException("assertion error!"));
-		assertEquals(cam.coeff, 0.5, BVNDecomposer.EPSILON);
-
+		assertEquals(0.5, cam.coeff, BVNDecomposer.EPSILON);
 
 		cam = NullUtils.orThrow(i.next(), () -> new BVNRuntimeException("assertion error!"));
-		assertEquals(cam.coeff, 0.5, BVNDecomposer.EPSILON);
+		assertEquals(0.5, cam.coeff, BVNDecomposer.EPSILON);
+
 
 		assertFalse(i.hasNext());
 	}
