@@ -18,7 +18,7 @@ public class BirkhoffPolytopeTest {
 	@SuppressWarnings("null")
 	@Parameters(name = "dim: {0}")
 	public static Iterable<Object> data() {
-		return IntStream.range(1, 11).mapToObj(i -> 200 * Integer.valueOf(i)).collect(Collectors.toList());
+		return IntStream.range(1, 11).mapToObj(i -> 40 * Integer.valueOf(i)).collect(Collectors.toList());
 	}
 	
 	@Parameter
