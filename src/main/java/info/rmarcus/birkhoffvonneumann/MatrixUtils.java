@@ -182,17 +182,60 @@ public class MatrixUtils {
 			toR[r1] = toR[r2];
 			toR[r2] = tmp;
 		}
-		
+
 		return toR;
 	}
-	
+
 	public static int[] randomPermutaitonSparse(Random r, int n) {
 		List<Integer> s = IntStream.range(0, n).mapToObj(i -> i).collect(Collectors.toCollection(() -> new ArrayList<Integer>(n)));
 		Collections.shuffle(s);
 		return NullUtils.orThrow(s.stream().mapToInt(i -> i).toArray(),
 				() -> new BVNRuntimeException("Could not convert ArrayList to array!"));
 	}
+
+	public static boolean isPermutation(double[][] matrix) {
+		for (int row = 0; row < matrix.length; row++) {
+			int numOnes = 0;
+			for (int col = 0; col < matrix[row].length; col++) {
+				if (matrix[row][col] == 1.0)
+					numOnes++;
+
+				if (matrix[row][col] != 1.0 && matrix[row][col] != 0.0)
+					return false;
+			}
+
+			if (numOnes != 1)
+				return false;
+		}
+
+		for (int col = 0; col < matrix.length; col++) {
+			int numOnes = 0;
+			
+			for (int row = 0; row < matrix.length; row++) {
+				if (matrix[row][col] == 1.0)
+					numOnes++;
+
+				if (matrix[row][col] != 1.0 && matrix[row][col] != 0.0)
+					return false;
+			}
+
+			if (numOnes != 1)
+				return false;
+		}
+
+		return true;
+	}
 	
+	public static double[][] randomMatrix(Random r, int n) {
+		double[][] toR = new double[n][n];
+		
+		for (int i = 0; i < toR.length; i++)
+			for (int j = 0; j < toR[i].length; j++)
+				toR[i][j] = r.nextDouble();
+		
+		return toR;
+	}
+
 	public static void printMatrix(double[][] matrix) {
 		for (double[] row : matrix) {
 			for (double itm : row) {
@@ -200,7 +243,7 @@ public class MatrixUtils {
 			}
 			System.out.println();
 		}
-		
+
 		System.out.println("-------------------------------");
 	}
 

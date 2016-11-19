@@ -133,28 +133,15 @@ public class BVNDecomposer {
 	private double[][] sampleFromGibbsMethod(Random r, double[][] matrix) throws BVNException {
 		double[][] toR = new double[matrix.length][matrix.length];
 
-		Set<Integer> removedRows = new HashSet<>();
-		Set<Integer> removedCols = new HashSet<>();
-		while(removedRows.size() != matrix.length) {
-			// find the elig rows
-			boolean[] elig = new boolean[matrix.length];
-			int numElig = 0;
-			for (int row = 0; row < matrix.length; row++) {
-				if (removedRows.contains(row))
-					continue;
-				
-				numElig++;
-				elig[row] = true;
-			}
-			
-			if (numElig <= 0) 
-				throw new BVNException("Could not sample a permutaiton, no eligible rows. Was the matrix striclty positive and non-zero?");
-			
+		boolean[] removedRows = new boolean[matrix.length];
+		boolean[] removedCols = new boolean[matrix.length];
+		
+		for (int currRow = 0; currRow < matrix.length; currRow++) {
 			// select a random row
-			int p = r.nextInt(numElig);
+			int p = r.nextInt(matrix.length - currRow);
 			int selectedRow = 0;
 			for (int i = 0; i < matrix.length; i++) {
-				if (removedRows.contains(i))
+				if (removedRows[i])
 					continue;
 				
 				if (p-- == 0) {
@@ -163,11 +150,13 @@ public class BVNDecomposer {
 				}
 			}
 			
+			removedRows[selectedRow] = true;
+			
 			// we now have the index of the row. Calculate
 			// the remaining mass from the columns still available
 			double remainingMass = 0.0;
 			for (int col = 0; col < matrix.length; col++) {
-				if (removedCols.contains(col))
+				if (removedCols[col])
 					continue;
 				
 				remainingMass += matrix[selectedRow][col];
@@ -177,7 +166,7 @@ public class BVNDecomposer {
 			double v = r.nextDouble();
 			int bestColIdx = -1;
 			for (int col = 0; col < matrix.length; col++) {
-				if (removedCols.contains(col))
+				if (removedCols[col])
 					continue;
 				
 				v -= matrix[selectedRow][col] / remainingMass;
@@ -189,9 +178,9 @@ public class BVNDecomposer {
 			
 			if (bestColIdx == -1)
 				throw new BVNException("Unable to sample a row up to mass " + v);
+			
+			removedCols[bestColIdx] = true;
 						
-			removedRows.add(selectedRow);
-			removedCols.add(bestColIdx);
 			toR[selectedRow][bestColIdx] = 1.0;
 		}
 		

@@ -27,7 +27,7 @@ public class MetropolisHastingsPermutationSearch {
 	
 	private double loss(double[][] bistoc) {
 		BVNDecomposer bvn = new BVNDecomposer();
-		bvn.setSamplingAlgorithm(SamplingAlgorithm.ENTROPY);
+		bvn.setSamplingAlgorithm(SamplingAlgorithm.GIBBS);
 		try {
 			double collector = 0.0;
 			for (int i = 0; i < SAMPLES_PER_MATRIX; i++) {
@@ -71,7 +71,7 @@ public class MetropolisHastingsPermutationSearch {
 
 
 		MetropolisHastingsPermutationSearch search = new MetropolisHastingsPermutationSearch(sortDim, lossFunc);
-		for (int i = 0; i < 50000; i++) {
+		for (int i = 0; i < 100000; i++) {
 			search.iterate();
 		}
 

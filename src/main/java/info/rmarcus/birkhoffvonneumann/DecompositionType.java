@@ -1,5 +1,5 @@
 package info.rmarcus.birkhoffvonneumann;
 
 public enum DecompositionType {
-	BVN, GREEDY, PERFECT, GIBBS
+	BVN, GREEDY, PERFECT
 }
