@@ -17,6 +17,16 @@ public class NullUtils {
 		return t;
 	}
 	
+	public static <T> T[] orThrow(T @Nullable [] t, Supplier<@NonNull RuntimeException> re) {
+		if (t == null) {
+			@Nullable RuntimeException tt = re.get();
+			throw tt;
+		}
+		
+		return t;
+	}
+
+	
 	public static <T> @Nullable T deoptional(@Nullable Optional<@NonNull T> min) {
 		if (min != null && min.isPresent())
 			return min.get();
@@ -56,6 +66,7 @@ public class NullUtils {
 			return v;
 		}
 	}
+
 
 
 }

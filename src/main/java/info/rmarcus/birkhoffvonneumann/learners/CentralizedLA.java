@@ -1,4 +1,4 @@
-package info.rmarcus.brikhoffvonneumann.learners;
+package info.rmarcus.birkhoffvonneumann.learners;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -10,14 +10,14 @@ import java.util.logging.Logger;
 import org.eclipse.jdt.annotation.Nullable;
 
 import info.rmarcus.NullUtils;
-import info.rmarcus.brikhoffvonneumann.BVNDecomposer;
-import info.rmarcus.brikhoffvonneumann.CoeffAndMatrix;
-import info.rmarcus.brikhoffvonneumann.CoeffAndMatrix.Swap;
-import info.rmarcus.brikhoffvonneumann.exceptions.BVNException;
-import info.rmarcus.brikhoffvonneumann.exceptions.BVNRuntimeException;
+import info.rmarcus.birkhoffvonneumann.BVNDecomposer;
+import info.rmarcus.birkhoffvonneumann.CoeffAndMatrix;
+import info.rmarcus.birkhoffvonneumann.SamplingAlgorithm;
+import info.rmarcus.birkhoffvonneumann.CoeffAndMatrix.Swap;
+import info.rmarcus.birkhoffvonneumann.exceptions.BVNException;
+import info.rmarcus.birkhoffvonneumann.exceptions.BVNRuntimeException;
 
 public class CentralizedLA {
-
 	
 	@SuppressWarnings("null")
 	private static final Logger l = Logger.getLogger(CentralizedLA.class.getName());
@@ -26,13 +26,14 @@ public class CentralizedLA {
 	private double learningRate;
 	private Random r = new Random(30);
 	private double@Nullable[][] best = null;
-	private double bestVal = Double.MAX_VALUE;
+	private double bestVal = Double.MIN_VALUE;
 	private BVNDecomposer bvn;
 
-	public CentralizedLA(int numItems, double learningRate) {
+	public CentralizedLA(int numItems, double learningRate, SamplingAlgorithm algo) {
 		w = new double[numItems][numItems];
 		this.learningRate = learningRate;
 		this.bvn = new BVNDecomposer();
+		this.bvn.setSamplingAlgorithm(algo);
 
 		// initialize our random guess where all permutations are equally likely
 		for (int i = 0; i < w.length; i++)
@@ -42,12 +43,14 @@ public class CentralizedLA {
 
 	public void iterate(ToDoubleFunction<double[][]> lossFunc) {
 		try {
-			double[][] sample = bvn.sample(r.nextDouble(), w);
+			double[][] sample = bvn.sample(r, w);
 			double reward = 1.0 - lossFunc.applyAsDouble(sample);
 			Set<Swap> swaps = CoeffAndMatrix.asSwaps(sample);
 			
-			if (bestVal > reward)
+			if (bestVal < reward) {
 				best = sample;
+				bestVal = reward;
+			}
 			
 			// new value for selected = old value + alpha * (1 - reward) * (1 - old value)
 			// new value for other = old value - alpha * (1 - reward) * old value
@@ -68,7 +71,6 @@ public class CentralizedLA {
 		} catch (BVNException e) {
 			l.log(Level.WARNING, "sampling failed in iterate()", e);
 			System.out.println(Arrays.deepToString(w));
-
 			return;
 		}
 	}
@@ -98,8 +100,8 @@ public class CentralizedLA {
 
 
 
-		CentralizedLA search = new CentralizedLA(toSort.length, 0.01);
-		for (int i = 0; i < 1000; i++) {
+		CentralizedLA search = new CentralizedLA(toSort.length, 0.1, SamplingAlgorithm.ENTROPY);
+		for (int i = 0; i < 10000; i++) {
 			search.iterate(lossFunc);
 		}
 

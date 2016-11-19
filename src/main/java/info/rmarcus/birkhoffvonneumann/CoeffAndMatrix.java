@@ -36,7 +36,7 @@
 // along with brikhoffvonneumann.  If not, see <http://www.gnu.org/licenses/>.
 // 
 // < end copyright > 
-package info.rmarcus.brikhoffvonneumann;
+package info.rmarcus.birkhoffvonneumann;
 
 import java.util.HashSet;
 import java.util.Set;

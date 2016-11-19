@@ -17,17 +17,17 @@
 // along with brikhoffvonneumann.  If not, see <http://www.gnu.org/licenses/>.
 // 
 // < end copyright > 
-package info.rmarcus.brikhoffvonneumann;
+package info.rmarcus.birkhoffvonneumann;
 
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
-import info.rmarcus.brikhoffvonneumann.exceptions.BVNException;
-import info.rmarcus.brikhoffvonneumann.exceptions.BVNNonBistochasticMatrixException;
-import info.rmarcus.brikhoffvonneumann.exceptions.BVNNonSquareMatrixException;
-import info.rmarcus.brikhoffvonneumann.learners.PermELearn;
+import info.rmarcus.birkhoffvonneumann.exceptions.BVNException;
+import info.rmarcus.birkhoffvonneumann.exceptions.BVNNonBistochasticMatrixException;
+import info.rmarcus.birkhoffvonneumann.exceptions.BVNNonSquareMatrixException;
+import info.rmarcus.birkhoffvonneumann.learners.PermELearn;
 
 class BVNUtils {
 	
@@ -88,10 +88,5 @@ class BVNUtils {
 		}
 	}
 	
-	static void printMatrix(double[][] matrix) {
-		for (double[] d : matrix) {
-			System.out.println(Arrays.toString(d));
-		}
-		System.out.println("---");
-	}
+
 }

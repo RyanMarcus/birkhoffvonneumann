@@ -1,4 +1,4 @@
 @NonNullByDefault
-package info.rmarcus.brikhoffvonneumann.exceptions;
+package info.rmarcus.birkhoffvonneumann.exceptions;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;

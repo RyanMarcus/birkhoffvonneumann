@@ -37,7 +37,7 @@
 // 
 // < end copyright > 
 
-package info.rmarcus.brikhoffvonneumann;
+package info.rmarcus.birkhoffvonneumann;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -54,11 +54,15 @@ import java.util.Set;
 import org.junit.Test;
 
 import info.rmarcus.NullUtils;
-import info.rmarcus.brikhoffvonneumann.CoeffAndMatrix.Swap;
-import info.rmarcus.brikhoffvonneumann.exceptions.BVNException;
-import info.rmarcus.brikhoffvonneumann.exceptions.BVNNonBistochasticMatrixException;
-import info.rmarcus.brikhoffvonneumann.exceptions.BVNNonSquareMatrixException;
-import info.rmarcus.brikhoffvonneumann.exceptions.BVNRuntimeException;
+import info.rmarcus.birkhoffvonneumann.BVNDecomposer;
+import info.rmarcus.birkhoffvonneumann.CoeffAndMatrix;
+import info.rmarcus.birkhoffvonneumann.DecompositionType;
+import info.rmarcus.birkhoffvonneumann.SinkhornBalancer;
+import info.rmarcus.birkhoffvonneumann.CoeffAndMatrix.Swap;
+import info.rmarcus.birkhoffvonneumann.exceptions.BVNException;
+import info.rmarcus.birkhoffvonneumann.exceptions.BVNNonBistochasticMatrixException;
+import info.rmarcus.birkhoffvonneumann.exceptions.BVNNonSquareMatrixException;
+import info.rmarcus.birkhoffvonneumann.exceptions.BVNRuntimeException;
 
 public class BVNDecomposerTest {
 

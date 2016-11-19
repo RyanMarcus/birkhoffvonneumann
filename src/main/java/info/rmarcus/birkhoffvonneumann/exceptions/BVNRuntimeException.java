@@ -17,7 +17,7 @@
 // along with brikhoffvonneumann.  If not, see <http://www.gnu.org/licenses/>.
 // 
 // < end copyright > 
-package info.rmarcus.brikhoffvonneumann.exceptions;
+package info.rmarcus.birkhoffvonneumann.exceptions;
 
 public class BVNRuntimeException extends RuntimeException {
 

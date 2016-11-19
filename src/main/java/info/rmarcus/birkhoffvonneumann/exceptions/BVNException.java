@@ -36,14 +36,13 @@
 // along with brikhoffvonneumann.  If not, see <http://www.gnu.org/licenses/>.
 // 
 // < end copyright > 
-package info.rmarcus.brikhoffvonneumann.exceptions;
+package info.rmarcus.birkhoffvonneumann.exceptions;
 
-public class BVNNonSquareMatrixException extends BVNException {
+public class BVNException extends Exception {
 
 	private static final long serialVersionUID = 1L;
-	
-	public BVNNonSquareMatrixException() {
-		super("The array passed to the BVN decomposer must represent a square matrix (it cannot be any other shape or null)");
-	}
 
+	public BVNException(String msg) {
+		super(msg);
+	}
 }

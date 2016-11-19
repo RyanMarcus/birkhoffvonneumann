@@ -1,0 +1,209 @@
+package info.rmarcus.birkhoffvonneumann;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Random;
+import java.util.function.DoubleUnaryOperator;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import org.eclipse.jdt.annotation.NonNull;
+
+import info.rmarcus.NullUtils;
+import info.rmarcus.birkhoffvonneumann.exceptions.BVNRuntimeException;
+
+public class MatrixUtils {
+	public static void multiply(double[][] dest, double[][] a, double[][] b) {
+		for (int i = 0; i < dest.length; i++) {
+			for (int j = 0; j < dest[i].length; j++) {
+				dest[i][j] = a[i][j] * b[i][j];
+			}
+		}
+	}
+
+	public static void multiply(double[][] dest, double[][] a, double b) {
+		for (int i = 0; i < dest.length; i++) {
+			for (int j = 0; j < dest[i].length; j++) {
+				dest[i][j] = a[i][j] * b;
+			}
+		}
+	}
+
+	public static void multiply(double[][] dest, double[] a, double b) {
+		for (int i = 0; i < dest.length; i++) {
+			for (int j = 0; j < dest[i].length; j++) {
+				dest[i][j] = a[i*dest.length + j] * b;
+			}
+		}
+	}
+
+
+	public static void add(double[][] dest, double[][] a, double[][] b) {
+		for (int i = 0; i < dest.length; i++) {
+			for (int j = 0; j < dest[i].length; j++) {
+				dest[i][j] = a[i][j] + b[i][j];
+			}
+		}
+	}
+
+	public static void add(double[][] dest, double[][] a, double b) {
+		for (int i = 0; i < dest.length; i++) {
+			for (int j = 0; j < dest[i].length; j++) {
+				dest[i][j] = a[i][j] + b;
+			}
+		}
+	}
+
+	public static void add(double[][] dest, double[][] a, double[] b) {
+		for (int i = 0; i < dest.length; i++) {
+			for (int j = 0; j < dest[i].length; j++) {
+				dest[i][j] = a[i][j] + b[i*dest.length + j];
+			}
+		}
+	}
+
+	public static void apply(double[][] dest, double[][] a, DoubleUnaryOperator f) {
+		for (int i = 0; i < dest.length; i++) {
+			for (int j = 0; j < dest[i].length; j++) {
+				dest[i][j] = f.applyAsDouble(a[i][j]);
+			}
+		}
+	}
+
+	public static double permanent(double[][] input) {
+		int n = input.length;
+
+		double collector = 0.0;
+		Iterator<BitSet> i = bitStringsOfSize(n);
+		while (i.hasNext()) {
+			BitSet nxt = NullUtils.orThrow(i.next(), () -> new BVNRuntimeException("Iterator returned null!"));
+			if (nxt.cardinality() == 0)
+				continue;
+
+			int mult = (int)Math.pow(-1, nxt.cardinality());
+			double accum = 1.0;
+
+			for (int row = 0; row < n; row++) {
+				double x = 0;
+				for (int col = 0; col < n; col++) {
+					if (!nxt.get(col))
+						continue;
+
+					x += input[row][col];
+				}
+
+				accum *= x;
+			}
+
+			collector += mult * accum;
+		}
+
+		int mult = (int)Math.pow(-1, n);
+		return mult * collector;
+
+	}
+
+	private static Iterator<BitSet> bitStringsOfSize(int n) {
+		return new Iterator<BitSet>() {
+			private BigInteger b = new BigInteger("0");
+			@Override
+			public boolean hasNext() {
+				return b.compareTo((new BigInteger("2")).pow(n)) < 0;
+			}
+
+			@Override
+			public @NonNull BitSet next() {
+				byte[] bytes = b.toByteArray();
+				BitSet toR = BitSet.valueOf(bytes);
+				BigInteger nxt = b.add(new BigInteger("1"));
+				if (nxt == null || toR == null) {
+					throw new NoSuchElementException("Unable to increment big int");
+				}
+				b = nxt;
+				return toR;
+			}
+
+		};
+	}
+
+
+	public static double[][] clone(double[][] m) {
+		double[][] toR = new double[m.length][];
+
+		for (int i = 0; i < m.length; i++) {
+			toR[i] = Arrays.copyOf(m[i], m[i].length);
+		}
+
+		return toR;
+	}
+
+	public static double[] randomDirectionInNDSpace(Random r, int n) {
+		double[] toR = new double[n];
+
+		double sumSquared = 0.0;
+		for (int i = 0; i < n; i++) {
+			toR[i] = r.nextGaussian();
+			sumSquared += Math.pow(toR[i], 2);
+		}
+
+		sumSquared = Math.sqrt(sumSquared);
+
+		for (int i = 0; i < n; i++)
+			toR[i] /= sumSquared;
+
+		return toR;
+	}
+
+	public static double[][] identity(int n) {
+		double[][] toR = new double[n][n];
+
+		for (int i = 0; i < n; i++)
+			toR[i][i] = 1.0;
+
+		return toR;
+	}
+
+	public static double[][] randomPermutation(Random r, int n) {
+		// start with the identity permutation
+		double[][] toR = MatrixUtils.identity(n);
+
+		// apply a Fisher-Yates shuffle
+		for (int i = 0; i < toR.length - 1; i++) {
+			int r1 = r.nextInt(toR.length - i) + i;
+			int r2 = r.nextInt(toR.length - i) + i;
+
+			double[] tmp = toR[r1];
+			toR[r1] = toR[r2];
+			toR[r2] = tmp;
+		}
+		
+		return toR;
+	}
+	
+	public static int[] randomPermutaitonSparse(Random r, int n) {
+		List<Integer> s = IntStream.range(0, n).mapToObj(i -> i).collect(Collectors.toCollection(() -> new ArrayList<Integer>(n)));
+		Collections.shuffle(s);
+		return NullUtils.orThrow(s.stream().mapToInt(i -> i).toArray(),
+				() -> new BVNRuntimeException("Could not convert ArrayList to array!"));
+	}
+	
+	public static void printMatrix(double[][] matrix) {
+		for (double[] row : matrix) {
+			for (double itm : row) {
+				System.out.printf("%.2f\t", itm);
+			}
+			System.out.println();
+		}
+		
+		System.out.println("-------------------------------");
+	}
+
+
+
+}

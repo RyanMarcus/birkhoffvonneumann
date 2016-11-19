@@ -1,10 +1,13 @@
-package info.rmarcus.brikhoffvonneumann;
+package info.rmarcus.birkhoffvonneumann;
 
 import static org.junit.Assert.assertEquals;
 
 import java.util.Random;
 
 import org.junit.Test;
+
+import info.rmarcus.birkhoffvonneumann.BVNDecomposer;
+import info.rmarcus.birkhoffvonneumann.MatrixUtils;
 
 public class MatrixUtilTest {
 

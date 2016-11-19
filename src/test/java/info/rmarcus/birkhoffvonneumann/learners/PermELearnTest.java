@@ -17,14 +17,15 @@
 // along with brikhoffvonneumann.  If not, see <http://www.gnu.org/licenses/>.
 // 
 // < end copyright > 
-package info.rmarcus.brikhoffvonneumann.learners;
+package info.rmarcus.birkhoffvonneumann.learners;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import info.rmarcus.brikhoffvonneumann.SinkhornBalancer;
+import info.rmarcus.birkhoffvonneumann.SinkhornBalancer;
+import info.rmarcus.birkhoffvonneumann.learners.PermELearn;
 
 public class PermELearnTest {
 

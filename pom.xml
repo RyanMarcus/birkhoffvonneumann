@@ -2,14 +2,14 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>info.rmarcus</groupId>
-	<artifactId>brikhoffvonneumann</artifactId>
+	<artifactId>birkhoffvonneumann</artifactId>
 	<version>0.0.1</version>
-	<name>Brikhoff-von Neumann Decomposition</name>
-	<description>A Brikhoff-von Neumann matrix decomposer</description>
-	<url>https://github.com/RyanMarcus/brikhoffvonneumann</url>
+	<name>Birkhoff-von Neumann Decomposition</name>
+	<description>A Birkhoff-von Neumann matrix decomposer</description>
+	<url>https://github.com/RyanMarcus/birkhoffvonneumann</url>
 
 	<scm>
-		<url>https://github.com/RyanMarcus/brikhoffvonneumann</url>
+		<url>https://github.com/RyanMarcus/birkhoffvonneumann</url>
 	</scm>
 
 	<licenses>

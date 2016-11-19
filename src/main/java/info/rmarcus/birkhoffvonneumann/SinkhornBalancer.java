@@ -17,12 +17,12 @@
 // along with brikhoffvonneumann.  If not, see <http://www.gnu.org/licenses/>.
 // 
 // < end copyright > 
-package info.rmarcus.brikhoffvonneumann;
+package info.rmarcus.birkhoffvonneumann;
 
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
-import info.rmarcus.brikhoffvonneumann.exceptions.BVNException;
+import info.rmarcus.birkhoffvonneumann.exceptions.BVNException;
 
 public class SinkhornBalancer {
 	private SinkhornBalancer() {

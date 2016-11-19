@@ -17,17 +17,17 @@
 // along with brikhoffvonneumann.  If not, see <http://www.gnu.org/licenses/>.
 // 
 // < end copyright > 
-package info.rmarcus.brikhoffvonneumann.learners;
+package info.rmarcus.birkhoffvonneumann.learners;
 
 import java.util.Arrays;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import info.rmarcus.brikhoffvonneumann.BVNDecomposer;
-import info.rmarcus.brikhoffvonneumann.SinkhornBalancer;
-import info.rmarcus.brikhoffvonneumann.exceptions.BVNException;
-import info.rmarcus.brikhoffvonneumann.exceptions.BVNRuntimeException;
+import info.rmarcus.birkhoffvonneumann.BVNDecomposer;
+import info.rmarcus.birkhoffvonneumann.SinkhornBalancer;
+import info.rmarcus.birkhoffvonneumann.exceptions.BVNException;
+import info.rmarcus.birkhoffvonneumann.exceptions.BVNRuntimeException;
 
 public class PermELearn {
 
@@ -54,7 +54,7 @@ public class PermELearn {
 		checkLossMatrix(lossMatrix);
 		try {
 			// create a sample from our current weight matrix
-			double[][] sample = bvn.sample(r.nextDouble(), w);
+			double[][] sample = bvn.sample(r, w);
 			updateWeights(lossMatrix);
 
 			return sample;

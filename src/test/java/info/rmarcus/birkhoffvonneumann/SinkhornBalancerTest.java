@@ -17,14 +17,16 @@
 // along with brikhoffvonneumann.  If not, see <http://www.gnu.org/licenses/>.
 // 
 // < end copyright > 
-package info.rmarcus.brikhoffvonneumann;
+package info.rmarcus.birkhoffvonneumann;
 
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import info.rmarcus.brikhoffvonneumann.exceptions.BVNException;
-import info.rmarcus.brikhoffvonneumann.exceptions.BVNNonSquareMatrixException;
+import info.rmarcus.birkhoffvonneumann.BVNUtils;
+import info.rmarcus.birkhoffvonneumann.SinkhornBalancer;
+import info.rmarcus.birkhoffvonneumann.exceptions.BVNException;
+import info.rmarcus.birkhoffvonneumann.exceptions.BVNNonSquareMatrixException;
 
 public class SinkhornBalancerTest {
 

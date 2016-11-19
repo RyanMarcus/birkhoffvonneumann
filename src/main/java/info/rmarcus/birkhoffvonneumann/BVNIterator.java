@@ -36,7 +36,7 @@
 // along with brikhoffvonneumann.  If not, see <http://www.gnu.org/licenses/>.
 // 
 // < end copyright > 
-package info.rmarcus.brikhoffvonneumann;
+package info.rmarcus.birkhoffvonneumann;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,7 +60,7 @@ import org.jgrapht.graph.SimpleGraph;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
 import info.rmarcus.NullUtils;
-import info.rmarcus.brikhoffvonneumann.exceptions.BVNRuntimeException;
+import info.rmarcus.birkhoffvonneumann.exceptions.BVNRuntimeException;
 
 
 public class BVNIterator implements Iterator<CoeffAndMatrix> {
