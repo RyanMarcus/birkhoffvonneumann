@@ -10,7 +10,7 @@ import info.rmarcus.birkhoffvonneumann.SamplingAlgorithm;
 import info.rmarcus.birkhoffvonneumann.exceptions.BVNException;
 
 public class MetropolisHastingsPermutationSearch {
-	private static final int SAMPLES_PER_MATRIX = 10;
+	private static final int SAMPLES_PER_MATRIX = 20;
 	
 	private ToDoubleFunction<double[][]> loss;
 	private double bestLoss = Double.POSITIVE_INFINITY;
@@ -37,7 +37,6 @@ public class MetropolisHastingsPermutationSearch {
 				if (realizedLoss < bestLoss) {
 					bestLoss = realizedLoss;
 					bestPerm = perm;
-					System.out.println("New best: " + bestLoss);
 				}
 				collector += realizedLoss;
 			}
@@ -60,7 +59,7 @@ public class MetropolisHastingsPermutationSearch {
 	}
 	
 	public static void main(String[] args) {
-		final int sortDim = 20;
+		final int sortDim = 10;
 		ToDoubleFunction<double[][]> lossFunc = (d -> {
 			return CoeffAndMatrix.asSwaps(d)
 					.stream()

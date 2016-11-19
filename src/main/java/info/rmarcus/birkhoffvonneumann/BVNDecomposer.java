@@ -38,10 +38,15 @@
 // < end copyright > 
 package info.rmarcus.birkhoffvonneumann;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -133,25 +138,15 @@ public class BVNDecomposer {
 	private double[][] sampleFromGibbsMethod(Random r, double[][] matrix) throws BVNException {
 		double[][] toR = new double[matrix.length][matrix.length];
 
-		boolean[] removedRows = new boolean[matrix.length];
+		List<Integer> rowOrder = IntStream.range(0, matrix.length)
+				.mapToObj(i -> i)
+				.collect(Collectors.toCollection(() -> new ArrayList<Integer>()));
+		
+		Collections.shuffle(rowOrder);
+		
 		boolean[] removedCols = new boolean[matrix.length];
 		
-		for (int currRow = 0; currRow < matrix.length; currRow++) {
-			// select a random row
-			int p = r.nextInt(matrix.length - currRow);
-			int selectedRow = 0;
-			for (int i = 0; i < matrix.length; i++) {
-				if (removedRows[i])
-					continue;
-				
-				if (p-- == 0) {
-					selectedRow = i;
-					break;
-				}
-			}
-			
-			removedRows[selectedRow] = true;
-			
+		for (Integer selectedRow : rowOrder) {
 			// we now have the index of the row. Calculate
 			// the remaining mass from the columns still available
 			double remainingMass = 0.0;
