@@ -114,7 +114,7 @@ public class BVNDecomposer {
 	 * @throws BVNException if the matrix is not square, bistochastic, or r is not between 0 and 1
 	 */
 	public double[][] sample(Random r, double[][] matrix) throws BVNException {
-		BVNUtils.checkMatrixInput(matrix);
+		// TODO this check is too expensive: BVNUtils.checkMatrixInput(matrix);
 		switch (sampling) {
 		case DECOMPOSITION:
 			return sampleFromDecomposition(r, matrix);

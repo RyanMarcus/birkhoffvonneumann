@@ -37,6 +37,7 @@ public class MetropolisHastingsPermutationSearch {
 				if (realizedLoss < bestLoss) {
 					bestLoss = realizedLoss;
 					bestPerm = perm;
+					System.out.println("New best: " + bestLoss);
 				}
 				collector += realizedLoss;
 			}
@@ -59,7 +60,7 @@ public class MetropolisHastingsPermutationSearch {
 	}
 	
 	public static void main(String[] args) {
-		final int sortDim = 10;
+		final int sortDim = 100;
 		ToDoubleFunction<double[][]> lossFunc = (d -> {
 			return CoeffAndMatrix.asSwaps(d)
 					.stream()

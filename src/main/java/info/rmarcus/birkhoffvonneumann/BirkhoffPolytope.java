@@ -28,7 +28,7 @@ public class BirkhoffPolytope {
 	}
 
 	public void setCurrentPoint(double[][] d) throws BVNException {
-		BVNUtils.checkMatrixInput(d);
+		// this check was too expensive: BVNUtils.checkMatrixInput(d);
 
 		if (d.length != n)
 			throw new BVNException("Dimension of matrix for this polytope must be " + n + " but was " + d.length);
