@@ -1,8 +1,8 @@
-# Brikhoff-von Neumann Decomposition
+# Birkhoff-von Neumann Decomposition
 
 ![Codeship status](https://codeship.com/projects/6d90aaa0-792d-0134-382a-3a1a91268848/status?branch=master)
 
-This package provides an implementation of Brikhoff's heuristic for generating Brikhoff-von Neumann decompositions of [bistochastic matricies](https://en.wikipedia.org/wiki/Doubly_stochastic_matrix).
+This package provides an implementation of Brikhoff's heuristic for generating Birkhoff-von Neumann decompositions of [bistochastic matricies](https://en.wikipedia.org/wiki/Doubly_stochastic_matrix).
 
 Maven:
 ```xml
