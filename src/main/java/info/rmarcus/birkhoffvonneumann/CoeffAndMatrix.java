@@ -56,6 +56,21 @@ public class CoeffAndMatrix {
 		return CoeffAndMatrix.asSwaps(matrix);
 	}
 	
+	public static int[] asFlatPerm(double[][] permutation) {
+		int[] toR = new int[permutation.length];
+		CoeffAndMatrix.asSwaps(permutation).stream()
+			.forEach(s -> toR[s.origPos] = s.newPos);
+		return toR;
+	}
+	
+	public static double[][] fromFlatPerm(int[] perm) {
+		double[][] toR = new double[perm.length][perm.length];
+		for (int i = 0; i < perm.length; i++) {
+			toR[i][perm[i]] = 1.0;
+		}
+		return toR;
+	}
+	
 	public static Set<Swap> asSwaps(double[][] permutation) {
 		Set<Swap> toR = new HashSet<>();
 		

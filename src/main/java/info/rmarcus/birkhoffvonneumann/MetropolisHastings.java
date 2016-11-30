@@ -8,10 +8,8 @@ class MetropolisHastings {
 
 	public static double[][] generateSample(Random r, double[][] matrix) throws BVNException {
 		// first, pull out any old permutation
-		BVNDecomposer bvn = new BVNDecomposer();
-		bvn.setSamplingAlgorithm(SamplingAlgorithm.ENTROPY);
-		double[][] toR = bvn.sample(r, matrix);
-		
+		double[][] toR = MatrixUtils.randomPermutation(r, matrix.length);
+				
 		double currQ = getPropDensity(toR, matrix);
 		for (int i = 0; i < SamplingAlgorithm.getBurnIn(); i++) {
 			double[][] proposed = MatrixUtils.clone(toR);
@@ -19,7 +17,7 @@ class MetropolisHastings {
 			
 			double nextQ = getPropDensity(proposed, matrix);
 			double alpha = nextQ / currQ;
-			
+						
 			if (alpha > 1.0 || r.nextDouble() > alpha) {
 				toR = proposed;
 				currQ = nextQ;
@@ -50,6 +48,10 @@ class MetropolisHastings {
 		double[] tmp = toModify[transposition[0]];
 		toModify[transposition[0]] = toModify[transposition[1]];
 		toModify[transposition[1]] = tmp;
+	}
+	
+	public static void main(String[] args) throws BVNException {
+		generateSample(new Random(), MatrixUtils.uniformBistoc(5));
 	}
 
 }

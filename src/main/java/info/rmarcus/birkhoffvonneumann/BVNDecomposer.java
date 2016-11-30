@@ -124,6 +124,8 @@ public class BVNDecomposer {
 			return sampleFromGibbsMethod(r, matrix);
 		case METROPOLIS_HASTINGS:
 			return sampleFromMetropolisHastingsMethod(r, matrix);
+		case UNIFORM:
+			return MatrixUtils.randomPermutation(r, matrix.length);
 		default:
 			throw new BVNException("No support for selected sampling method: " + sampling);
 
@@ -142,7 +144,7 @@ public class BVNDecomposer {
 				.mapToObj(i -> i)
 				.collect(Collectors.toCollection(() -> new ArrayList<Integer>()));
 		
-		Collections.shuffle(rowOrder);
+		Collections.shuffle(rowOrder, r);
 		
 		boolean[] removedCols = new boolean[matrix.length];
 		

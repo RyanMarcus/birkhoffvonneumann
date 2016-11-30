@@ -168,27 +168,24 @@ public class MatrixUtils {
 
 		return toR;
 	}
-
-	public static double[][] randomPermutation(Random r, int n) {
-		// start with the identity permutation
-		double[][] toR = MatrixUtils.identity(n);
-
-		// apply a Fisher-Yates shuffle
-		for (int i = 0; i < toR.length - 1; i++) {
-			int r1 = r.nextInt(toR.length - i) + i;
-			int r2 = r.nextInt(toR.length - i) + i;
-
-			double[] tmp = toR[r1];
-			toR[r1] = toR[r2];
-			toR[r2] = tmp;
-		}
-
+	
+	public static double[][] uniformBistoc(int n) {
+		double[][] toR = new double[n][n];
+		
+		for (int i = 0; i < n; i++)
+			for (int j = 0; j < n; j++)
+				toR[i][j] = 1.0 / (double)n;
+		
 		return toR;
 	}
 
-	public static int[] randomPermutaitonSparse(Random r, int n) {
+	public static double[][] randomPermutation(Random r, int n) {
+		return CoeffAndMatrix.fromFlatPerm(randomPermutationSparse(r, n));
+	}
+
+	public static int[] randomPermutationSparse(Random r, int n) {
 		List<Integer> s = IntStream.range(0, n).mapToObj(i -> i).collect(Collectors.toCollection(() -> new ArrayList<Integer>(n)));
-		Collections.shuffle(s);
+		Collections.shuffle(s, r);
 		return NullUtils.orThrow(s.stream().mapToInt(i -> i).toArray(),
 				() -> new BVNRuntimeException("Could not convert ArrayList to array!"));
 	}

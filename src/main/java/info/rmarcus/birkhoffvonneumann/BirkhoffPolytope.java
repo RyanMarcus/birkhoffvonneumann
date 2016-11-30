@@ -41,8 +41,8 @@ public class BirkhoffPolytope {
 	}
 
 	public double[] getRandomDirection(Random r) {
-		int[] p1 = MatrixUtils.randomPermutaitonSparse(r, n);
-		int[] p2 = MatrixUtils.randomPermutaitonSparse(r, n);
+		int[] p1 = MatrixUtils.randomPermutationSparse(r, n);
+		int[] p2 = MatrixUtils.randomPermutationSparse(r, n);
 	
 		// to find the maximal coeffs for each permutation,
 		// which is the minimal entry in the matrix.
