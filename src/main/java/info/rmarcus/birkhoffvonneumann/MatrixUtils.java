@@ -13,6 +13,7 @@ import java.util.function.DoubleUnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.apache.commons.math3.linear.ArrayRealVector;
 import org.eclipse.jdt.annotation.NonNull;
 
 import info.rmarcus.NullUtils;
@@ -107,6 +108,12 @@ public class MatrixUtils {
 		int mult = (int)Math.pow(-1, n);
 		return mult * collector;
 
+	}
+	
+	public static double[] normalize(double[] input) {
+		ArrayRealVector arv = new ArrayRealVector(input);
+		arv.mapDivideToSelf(arv.getNorm());
+		return arv.toArray();
 	}
 
 	private static Iterator<BitSet> bitStringsOfSize(int n) {
