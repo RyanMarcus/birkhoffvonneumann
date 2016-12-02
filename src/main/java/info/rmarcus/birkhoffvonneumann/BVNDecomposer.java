@@ -61,7 +61,7 @@ import info.rmarcus.birkhoffvonneumann.exceptions.BVNRuntimeException;
  *
  */
 public class BVNDecomposer {
-	static final double EPSILON = 0.00001;
+	public static final double EPSILON = 0.00001;
 	private final DecompositionType type;
 	private SamplingAlgorithm sampling;
 

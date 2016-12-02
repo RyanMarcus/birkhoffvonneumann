@@ -1,17 +1,18 @@
-package info.rmarcus.birkhoffvonneumann;
+package info.rmarcus.birkhoffvonneumann.polytope;
 
 import java.util.Arrays;
 import java.util.Random;
 
 import info.rmarcus.NullUtils;
+import info.rmarcus.birkhoffvonneumann.MatrixUtils;
 import info.rmarcus.birkhoffvonneumann.exceptions.BVNException;
 import info.rmarcus.birkhoffvonneumann.exceptions.BVNRuntimeException;
 
-public class BirkhoffPolytope {
+public class UnderconstrainedBirkhoffPolytope implements BirkhoffPolytope {
 	private int n;
 	private double[][] point;
 
-	public BirkhoffPolytope(int n) {
+	public UnderconstrainedBirkhoffPolytope(int n) {
 		this.n = n;
 
 		point = new double[n][n];
@@ -27,6 +28,10 @@ public class BirkhoffPolytope {
 		return n;
 	}
 
+	/* (non-Javadoc)
+	 * @see info.rmarcus.birkhoffvonneumann.polytope.BirkhoffPolytopeI#setCurrentPoint(double[][])
+	 */
+	@Override
 	public void setCurrentPoint(double[][] d) throws BVNException {
 		// this check was too expensive: BVNUtils.checkMatrixInput(d);
 
@@ -36,10 +41,18 @@ public class BirkhoffPolytope {
 		this.point = d;
 	}
 
+	/* (non-Javadoc)
+	 * @see info.rmarcus.birkhoffvonneumann.polytope.BirkhoffPolytopeI#getCurrentPoint()
+	 */
+	@Override
 	public double[][] getCurrentPoint() {
 		return point;
 	}
 
+	/* (non-Javadoc)
+	 * @see info.rmarcus.birkhoffvonneumann.polytope.BirkhoffPolytopeI#getRandomDirection(java.util.Random)
+	 */
+	@Override
 	public double[] getRandomDirection(Random r) {
 		int[] p1 = MatrixUtils.randomPermutationSparse(r, n);
 		int[] p2 = MatrixUtils.randomPermutationSparse(r, n);
@@ -71,30 +84,34 @@ public class BirkhoffPolytope {
 		
 	}
 
-	public double getDistanceFromPointToEdge(double[] direction) throws BVNException {
+//	public double getDistanceFromPointToEdge(double[] direction) throws BVNException {
+//
+//		if ((int)Math.sqrt(direction.length) != n)
+//			throw new BVNException("Direction of matrix for this polytope must be " + n + "^2 but was " + direction.length);
+//
+//		double min = 0.0;
+//		double max = 1000.0;
+//
+//		while (max - min > BVNDecomposer.EPSILON) {
+//			double midpoint = (max + min) / 2.0;
+//			double[][] tmp = new double[n][n];
+//			MatrixUtils.multiply(tmp, direction, midpoint);
+//			MatrixUtils.add(tmp, tmp, point);
+//
+//			if (BVNUtils.isBistochastic(tmp)) {
+//				min = midpoint;
+//			} else {
+//				max = midpoint;
+//			}
+//		}
+//
+//		return min;
+//	}
 
-		if ((int)Math.sqrt(direction.length) != n)
-			throw new BVNException("Direction of matrix for this polytope must be " + n + "^2 but was " + direction.length);
-
-		double min = 0.0;
-		double max = 1000.0;
-
-		while (max - min > BVNDecomposer.EPSILON) {
-			double midpoint = (max + min) / 2.0;
-			double[][] tmp = new double[n][n];
-			MatrixUtils.multiply(tmp, direction, midpoint);
-			MatrixUtils.add(tmp, tmp, point);
-
-			if (BVNUtils.isBistochastic(tmp)) {
-				min = midpoint;
-			} else {
-				max = midpoint;
-			}
-		}
-
-		return min;
-	}
-
+	/* (non-Javadoc)
+	 * @see info.rmarcus.birkhoffvonneumann.polytope.BirkhoffPolytopeI#movePoint(double[], double)
+	 */
+	@Override
 	public void movePoint(double[] direction, double inc) {
 		if (inc < 0 || inc >= 1) {
 			throw new BVNRuntimeException("Increment inc must be 0 <= inc < 1");
@@ -108,7 +125,7 @@ public class BirkhoffPolytope {
 	public static void main(String[] args) throws BVNException {
 		Random r = new Random();
 
-		BirkhoffPolytope bp = new BirkhoffPolytope(5);
+		BirkhoffPolytope bp = new UnderconstrainedBirkhoffPolytope(5);
 		double[] direction = bp.getRandomDirection(r);
 
 		System.out.println(Arrays.deepToString(bp.getCurrentPoint()));

@@ -4,6 +4,6 @@ public enum SamplingAlgorithm {
 	DECOMPOSITION, ENTROPY, GIBBS, METROPOLIS_HASTINGS, UNIFORM;
 	
 	static int getBurnIn() {
-		return 200;
+		return 500;
 	}
 }

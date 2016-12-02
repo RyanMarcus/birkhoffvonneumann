@@ -3,9 +3,11 @@ package info.rmarcus.birkhoffvonneumann.learners;
 import java.util.Random;
 import java.util.function.ToDoubleFunction;
 
-import info.rmarcus.birkhoffvonneumann.BirkhoffPolytope;
+import info.rmarcus.birkhoffvonneumann.MatrixUtils;
 import info.rmarcus.birkhoffvonneumann.exceptions.BVNException;
 import info.rmarcus.birkhoffvonneumann.exceptions.BVNRuntimeException;
+import info.rmarcus.birkhoffvonneumann.polytope.BirkhoffPolytope;
+import info.rmarcus.birkhoffvonneumann.polytope.UnderconstrainedBirkhoffPolytope;
 
 public class MetropolisHastingsBistochasticSearch {
 	
@@ -21,13 +23,10 @@ public class MetropolisHastingsBistochasticSearch {
 	
 	public MetropolisHastingsBistochasticSearch(int n, ToDoubleFunction<double[][]> loss) {
 		this.loss = loss;
-		bestPerm = new double[n][n];
-		for (int i = 0; i < n; i++)
-			for (int j = 0; j < n; j++)
-				bestPerm[i][j] = 1.0 / (double) n;
+		bestPerm = MatrixUtils.uniformBistoc(n);
 		
 		currentLoss = 1.0 / loss.applyAsDouble(bestPerm);
-		bp = new BirkhoffPolytope(n);
+		bp = new UnderconstrainedBirkhoffPolytope(n);
 	}
 	
 	public double[][] getBestPerm() {

@@ -60,7 +60,7 @@ public class MetropolisHastingsPermutationSearch {
 	}
 	
 	public static void main(String[] args) {
-		final int sortDim = 100;
+		final int sortDim = 20;
 		ToDoubleFunction<double[][]> lossFunc = (d -> {
 			return CoeffAndMatrix.asSwaps(d)
 					.stream()
@@ -71,7 +71,7 @@ public class MetropolisHastingsPermutationSearch {
 
 
 		MetropolisHastingsPermutationSearch search = new MetropolisHastingsPermutationSearch(sortDim, lossFunc);
-		for (int i = 0; i < 100000; i++) {
+		for (int i = 0; i < 1000; i++) {
 			search.iterate();
 		}
 

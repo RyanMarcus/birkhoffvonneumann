@@ -12,6 +12,9 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
+import info.rmarcus.birkhoffvonneumann.polytope.BirkhoffPolytope;
+import info.rmarcus.birkhoffvonneumann.polytope.UnderconstrainedBirkhoffPolytope;
+
 @RunWith(Parameterized.class)
 public class BirkhoffPolytopeTest {
 
@@ -26,7 +29,7 @@ public class BirkhoffPolytopeTest {
 	
 	@Test
 	public void randomMovementTest() {
-		BirkhoffPolytope bp = new BirkhoffPolytope(dim);
+		BirkhoffPolytope bp = new UnderconstrainedBirkhoffPolytope(dim);
 		Random r = new Random(42);
 		
 		for (int i = 0; i < 100; i++) {
