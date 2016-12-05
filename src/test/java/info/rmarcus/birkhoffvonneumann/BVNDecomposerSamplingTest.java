@@ -19,12 +19,12 @@ public class BVNDecomposerSamplingTest {
 	public static Object[] data() {
 		return SamplingAlgorithm.values();
 	}
-	
+
 	@Parameter
 	public SamplingAlgorithm algo = SamplingAlgorithm.DECOMPOSITION;
-	
+
 	private Random r = new Random(30);
-	
+
 	@Test
 	public void methodIsValid() throws BVNException {
 		BVNDecomposer d = new BVNDecomposer();
@@ -34,23 +34,25 @@ public class BVNDecomposerSamplingTest {
 			{ 1./3., 1./3., 1./3. },
 			{ 1./3., 1./3., 1./3. }
 		});
-		
+
 		assertTrue(MatrixUtils.isPermutation(perm));
-		
+
 	}
-	
+
 	@Test
 	public void methodIsValidRandom() throws BVNException {
 		BVNDecomposer d = new BVNDecomposer();
 		d.setSamplingAlgorithm(algo);
-		
-		double[][] random = MatrixUtils.randomMatrix(r, 50);
-		SinkhornBalancer.balance(random);
-		double[][] perm = d.sample(r, random);
-		
-		assertTrue(MatrixUtils.isPermutation(perm));
-		
+
+		for (int i = 0; i < 10; i++) {
+			double[][] random = MatrixUtils.randomMatrix(r, 30);
+			SinkhornBalancer.balance(random);
+			double[][] perm = d.sample(r, random);
+
+			assertTrue(MatrixUtils.isPermutation(perm));
+		}
+
 	}
-	
-	
+
+
 }

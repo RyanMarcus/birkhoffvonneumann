@@ -128,9 +128,7 @@ public class BVNDecomposer {
 			return MatrixUtils.randomPermutation(r, matrix.length);
 		default:
 			throw new BVNException("No support for selected sampling method: " + sampling);
-
 		}
-
 	}
 
 	private double[][] sampleFromMetropolisHastingsMethod(Random r, double[][] matrix) throws BVNException {

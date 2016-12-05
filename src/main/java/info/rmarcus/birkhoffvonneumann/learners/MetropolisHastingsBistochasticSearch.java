@@ -7,7 +7,7 @@ import info.rmarcus.birkhoffvonneumann.MatrixUtils;
 import info.rmarcus.birkhoffvonneumann.exceptions.BVNException;
 import info.rmarcus.birkhoffvonneumann.exceptions.BVNRuntimeException;
 import info.rmarcus.birkhoffvonneumann.polytope.BirkhoffPolytope;
-import info.rmarcus.birkhoffvonneumann.polytope.UnderconstrainedBirkhoffPolytope;
+import info.rmarcus.birkhoffvonneumann.polytope.VertexCurveBirkhoffPolytope;
 
 public class MetropolisHastingsBistochasticSearch {
 	
@@ -26,7 +26,8 @@ public class MetropolisHastingsBistochasticSearch {
 		bestPerm = MatrixUtils.uniformBistoc(n);
 		
 		currentLoss = 1.0 / loss.applyAsDouble(bestPerm);
-		bp = new UnderconstrainedBirkhoffPolytope(n);
+		//bp = new PointLinearBirkhoffPolytope(n, BistochasticSampler.dirichletSampler());
+		bp = new VertexCurveBirkhoffPolytope(n);
 	}
 	
 	public double[][] getBestPerm() {

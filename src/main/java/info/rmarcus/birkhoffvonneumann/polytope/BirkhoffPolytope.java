@@ -13,5 +13,6 @@ public interface BirkhoffPolytope {
 	public double[] getRandomDirection(Random r);
 
 	public void movePoint(double[] direction, double inc);
+	
 
 }

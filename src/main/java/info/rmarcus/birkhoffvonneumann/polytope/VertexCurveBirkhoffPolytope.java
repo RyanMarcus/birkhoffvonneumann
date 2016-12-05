@@ -8,11 +8,11 @@ import info.rmarcus.birkhoffvonneumann.MatrixUtils;
 import info.rmarcus.birkhoffvonneumann.exceptions.BVNException;
 import info.rmarcus.birkhoffvonneumann.exceptions.BVNRuntimeException;
 
-public class UnderconstrainedBirkhoffPolytope implements BirkhoffPolytope {
+public class VertexCurveBirkhoffPolytope implements BirkhoffPolytope {
 	private int n;
 	private double[][] point;
 
-	public UnderconstrainedBirkhoffPolytope(int n) {
+	public VertexCurveBirkhoffPolytope(int n) {
 		this.n = n;
 
 		point = new double[n][n];
@@ -28,9 +28,6 @@ public class UnderconstrainedBirkhoffPolytope implements BirkhoffPolytope {
 		return n;
 	}
 
-	/* (non-Javadoc)
-	 * @see info.rmarcus.birkhoffvonneumann.polytope.BirkhoffPolytopeI#setCurrentPoint(double[][])
-	 */
 	@Override
 	public void setCurrentPoint(double[][] d) throws BVNException {
 		// this check was too expensive: BVNUtils.checkMatrixInput(d);
@@ -41,17 +38,12 @@ public class UnderconstrainedBirkhoffPolytope implements BirkhoffPolytope {
 		this.point = d;
 	}
 
-	/* (non-Javadoc)
-	 * @see info.rmarcus.birkhoffvonneumann.polytope.BirkhoffPolytopeI#getCurrentPoint()
-	 */
 	@Override
 	public double[][] getCurrentPoint() {
 		return point;
 	}
 
-	/* (non-Javadoc)
-	 * @see info.rmarcus.birkhoffvonneumann.polytope.BirkhoffPolytopeI#getRandomDirection(java.util.Random)
-	 */
+
 	@Override
 	public double[] getRandomDirection(Random r) {
 		int[] p1 = MatrixUtils.randomPermutationSparse(r, n);
@@ -108,9 +100,7 @@ public class UnderconstrainedBirkhoffPolytope implements BirkhoffPolytope {
 //		return min;
 //	}
 
-	/* (non-Javadoc)
-	 * @see info.rmarcus.birkhoffvonneumann.polytope.BirkhoffPolytopeI#movePoint(double[], double)
-	 */
+
 	@Override
 	public void movePoint(double[] direction, double inc) {
 		if (inc < 0 || inc >= 1) {
@@ -125,12 +115,17 @@ public class UnderconstrainedBirkhoffPolytope implements BirkhoffPolytope {
 	public static void main(String[] args) throws BVNException {
 		Random r = new Random();
 
-		BirkhoffPolytope bp = new UnderconstrainedBirkhoffPolytope(5);
+		BirkhoffPolytope bp = new VertexCurveBirkhoffPolytope(5);
 		double[] direction = bp.getRandomDirection(r);
 
 		System.out.println(Arrays.deepToString(bp.getCurrentPoint()));
 		bp.movePoint(direction, 0.5);
 		System.out.println(Arrays.deepToString(bp.getCurrentPoint()));
 
+	}
+	
+	@Override
+	public String toString() {
+		return "vertex-curve";
 	}
 }

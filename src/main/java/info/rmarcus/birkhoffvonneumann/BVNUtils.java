@@ -20,19 +20,15 @@
 package info.rmarcus.birkhoffvonneumann;
 
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
-import info.rmarcus.birkhoffvonneumann.exceptions.BVNException;
 import info.rmarcus.birkhoffvonneumann.exceptions.BVNNonBistochasticMatrixException;
 import info.rmarcus.birkhoffvonneumann.exceptions.BVNNonSquareMatrixException;
-import info.rmarcus.birkhoffvonneumann.learners.PermELearn;
 
-class BVNUtils {
-	
-	@SuppressWarnings("null")
-	private static final Logger l = Logger.getLogger(PermELearn.class.getName());
+public class BVNUtils {
+
+	//@SuppressWarnings("null")
+	//private static final Logger l = Logger.getLogger(PermELearn.class.getName());
 
 	private BVNUtils() {
 
@@ -45,29 +41,13 @@ class BVNUtils {
 			throw new BVNNonSquareMatrixException();
 	}
 
-	static void checkMatrixInput(double[][] matrix) throws BVNNonSquareMatrixException, BVNNonBistochasticMatrixException {
+	public static void checkMatrixInput(double[][] matrix) throws BVNNonSquareMatrixException, BVNNonBistochasticMatrixException {
 
 		checkSquare(matrix);
-		
-		if (!isNonNeg(matrix))
-			throw new BVNNonBistochasticMatrixException();
-		
 
-		// check to make sure the matrix is bistochastic.
-		// first, check the row sums.
-		if (Arrays.stream(matrix)
-				.map(row -> Arrays.stream(row).sum())
-				.anyMatch(d -> Math.abs(1.0 - d) > BVNDecomposer.EPSILON))
+		if (!isBistochastic(matrix))
 			throw new BVNNonBistochasticMatrixException();
-
-		// next, check the column sums
-		if (IntStream.range(0, matrix.length).mapToDouble(i -> {
-			double collector = 0.0;
-			for (int j = 0; j < matrix[i].length; j++)
-				collector += matrix[i][j];
-			return collector;
-		}).anyMatch(d -> Math.abs(1 - d) > BVNDecomposer.EPSILON))
-			throw new BVNNonBistochasticMatrixException();
+	
 
 	}
 
@@ -79,14 +59,28 @@ class BVNUtils {
 	}
 
 	static boolean isBistochastic(double[][] matrix) {
-		try {
-			checkMatrixInput(matrix);
-			return true;
-		} catch (BVNException e) {
-			l.log(Level.FINEST, "matrix was not bistochastic", e);
+		// check to make sure the matrix is bistochastic.
+		// first, check the row sums.
+		if (Arrays.stream(matrix)
+				.map(row -> Arrays.stream(row).sum())
+				.anyMatch(d -> Math.abs(1.0 - d) > BVNDecomposer.EPSILON))
 			return false;
-		}
+
+		// next, check the column sums
+		if (IntStream.range(0, matrix.length).mapToDouble(i -> {
+			double collector = 0.0;
+			for (int j = 0; j < matrix[i].length; j++)
+				collector += matrix[i][j];
+			return collector;
+		}).anyMatch(d -> Math.abs(1 - d) > BVNDecomposer.EPSILON))
+			return false;;
+
+		// check the individual values
+		if (!isNonNeg(matrix))
+			return false;
+		
+		return true;
 	}
-	
+
 
 }

@@ -68,6 +68,14 @@ public class MatrixUtils {
 			}
 		}
 	}
+	
+	public static void subtract(double[][] dest, double[][] a, double[][] b) {
+		for (int i = 0; i < dest.length; i++) {
+			for (int j = 0; j < dest[i].length; j++) {
+				dest[i][j] = a[i][j] - b[i][j];
+			}
+		}
+	}
 
 	public static void apply(double[][] dest, double[][] a, DoubleUnaryOperator f) {
 		for (int i = 0; i < dest.length; i++) {
@@ -75,6 +83,30 @@ public class MatrixUtils {
 				dest[i][j] = f.applyAsDouble(a[i][j]);
 			}
 		}
+	}
+	
+	public static double dot(double[] a, double[] b) {
+		double accum = 0.0;
+		for (int i = 0; i < a.length && i < b.length; i++) {
+			accum += a[i] * b[i];
+		}
+		
+		return accum;
+	}
+	
+	public static double[] flatten(double[][] a) {
+		List<Double> l = new ArrayList<Double>(a.length * a.length);
+		for (int i = 0; i < a.length; i++) {
+			for (int j = 0; j < a[i].length; j++) {
+				l.add(a[i][j]);
+			}
+		}
+		
+		final double[] toR = l.stream().mapToDouble(d -> d).toArray();
+		if (toR != null)
+			return toR;
+		
+		throw new BVNRuntimeException("Unable to map double stream to array!");
 	}
 
 	public static double permanent(double[][] input) {
@@ -113,7 +145,8 @@ public class MatrixUtils {
 	public static double[] normalize(double[] input) {
 		ArrayRealVector arv = new ArrayRealVector(input);
 		arv.mapDivideToSelf(arv.getNorm());
-		return arv.toArray();
+		return NullUtils.orThrow(arv.toArray(),
+				() -> new BVNRuntimeException("Could not normalize array!"));
 	}
 
 	private static Iterator<BitSet> bitStringsOfSize(int n) {
