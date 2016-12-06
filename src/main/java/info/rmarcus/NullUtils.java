@@ -57,12 +57,26 @@ public class NullUtils {
 	   T apply(U arg1, V arg2) throws Exception;
 	}
 	
+	@FunctionalInterface
+	public interface CheckedConsumer<U> {
+	   void apply(U arg1) throws Exception;
+	}
+	
 	public static <U, V, T> SafeOpt<T> wrapCall(CheckedBiFunction<U, V, T> f, U arg1, V arg2) {
 		try {
 			T res = f.apply(arg1, arg2);
 			return new SafeOpt<T>(res);
 		} catch (Exception e) {
 			return new SafeOpt<T>(e);
+		}
+	}
+	
+	public static <U> SafeOpt<Boolean> wrapCall(CheckedConsumer<U> f, U arg1) {
+		try {
+			f.apply(arg1);
+			return new SafeOpt<Boolean>(Boolean.valueOf(true));
+		} catch (Exception e) {
+			return new SafeOpt<Boolean>(e);
 		}
 	}
 	
@@ -117,6 +131,13 @@ public class NullUtils {
 				return new SafeOpt<Double>(e);
 			
 			return new SafeOpt<Double>(Double.valueOf(f.applyAsDouble(v)));
+		}
+		
+		public void throwIfExceptionPresent() {
+			final Exception exp = e;
+			if (exp != null) {
+				throw new RuntimeException(exp.getMessage());
+			}
 		}
 	}
 	

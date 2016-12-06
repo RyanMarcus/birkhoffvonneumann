@@ -17,6 +17,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 import info.rmarcus.birkhoffvonneumann.polytope.BirkhoffPolytope;
 import info.rmarcus.birkhoffvonneumann.polytope.PointLinearBirkhoffPolytope;
+import info.rmarcus.birkhoffvonneumann.polytope.TranspositionBirkhoffPolytope;
 import info.rmarcus.birkhoffvonneumann.polytope.VertexCurveBirkhoffPolytope;
 import info.rmarcus.birkhoffvonneumann.samplers.BistochasticSampler;
 
@@ -26,10 +27,12 @@ public class BirkhoffPolytopeTest {
 	@Parameters(name = "dim: {0} type: {1}")
 	public static Collection<Object[]> data() {
 		List<Object[]> toR = new LinkedList<>();
-		for (int i = 0; i < 10; i++) {
+		for (int i = 1; i < 10; i++) {
 			int dim = i * 40;
 			toR.add(new Object[] { dim, new VertexCurveBirkhoffPolytope(dim)});
 			toR.add(new Object[] { dim, new PointLinearBirkhoffPolytope(dim, BistochasticSampler.dirichletSampler())});
+			toR.add(new Object[] { dim, new TranspositionBirkhoffPolytope(dim) });
+
 		}
 		
 		return toR;
