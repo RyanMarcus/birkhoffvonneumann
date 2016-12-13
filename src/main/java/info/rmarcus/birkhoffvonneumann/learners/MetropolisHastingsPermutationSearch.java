@@ -91,7 +91,7 @@ public class MetropolisHastingsPermutationSearch {
 
 		long t = System.currentTimeMillis();
 		MetropolisHastingsPermutationSearch search = new MetropolisHastingsPermutationSearch(sortDim, lossFunc);
-		for (int i = 0; i < 100000; i++) {
+		for (int i = 0; i < 300000; i++) {
 			search.iterate();
 		}
 
