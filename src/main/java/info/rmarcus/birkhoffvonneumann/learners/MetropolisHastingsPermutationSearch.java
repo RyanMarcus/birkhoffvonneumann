@@ -79,7 +79,7 @@ public class MetropolisHastingsPermutationSearch {
 	}
 
 	public static void main(String[] args) {
-		final int sortDim = 20;
+		final int sortDim = 40;
 		ToDoubleFunction<double[][]> lossFunc = (d -> {
 			return CoeffAndMatrix.asSwaps(d)
 					.stream()

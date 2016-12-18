@@ -3,11 +3,14 @@ package info.rmarcus.birkhoffvonneumann.learners;
 import java.util.Random;
 import java.util.function.ToDoubleFunction;
 
+import org.apache.commons.math3.distribution.BetaDistribution;
+import org.apache.commons.math3.distribution.RealDistribution;
+
 import info.rmarcus.birkhoffvonneumann.MatrixUtils;
 import info.rmarcus.birkhoffvonneumann.exceptions.BVNException;
 import info.rmarcus.birkhoffvonneumann.exceptions.BVNRuntimeException;
 import info.rmarcus.birkhoffvonneumann.polytope.BirkhoffPolytope;
-import info.rmarcus.birkhoffvonneumann.polytope.RectangleBirkhoffPolytope;
+import info.rmarcus.birkhoffvonneumann.polytope.VertexCurveBirkhoffPolytope;
 
 public class MetropolisHastingsBistochasticSearch {
 	
@@ -17,6 +20,8 @@ public class MetropolisHastingsBistochasticSearch {
 	private double currentLoss;
 	private double[][] bestPerm;
 	
+	private RealDistribution distanceDistrib;
+	
 	private BirkhoffPolytope bp;
 	
 	private Random r = new Random(32);
@@ -25,11 +30,13 @@ public class MetropolisHastingsBistochasticSearch {
 		this.loss = loss;
 		bestPerm = MatrixUtils.uniformBistoc(n);
 		
+		distanceDistrib = new BetaDistribution(1.0, 3.0);
+		
 		currentLoss = 1.0 / loss.applyAsDouble(bestPerm);
-		bp = new RectangleBirkhoffPolytope(n);
+		//bp = new RectangleBirkhoffPolytope(n);
 		//bp = new PointLinearBirkhoffPolytope(n, BistochasticSampler.dirichletSampler());
 		//bp = new TranspositionBirkhoffPolytope(n);
-		//bp = new VertexCurveBirkhoffPolytope(n);
+		bp = new VertexCurveBirkhoffPolytope(n);
 	}
 	
 	public double[][] getBestPerm() {
@@ -41,7 +48,8 @@ public class MetropolisHastingsBistochasticSearch {
 		
 		double[] dir = bp.getRandomDirection(r);
 		double[][] current = bp.getCurrentPoint();
-		bp.movePoint(dir, r.nextDouble());
+		double moveBy = r.nextDouble();//1.0 - distanceDistrib.sample();
+		bp.movePoint(dir, moveBy);
 		double[][] proposed = bp.getCurrentPoint();
 		
 		double proposedLoss = 1.0 / loss.applyAsDouble(proposed);
