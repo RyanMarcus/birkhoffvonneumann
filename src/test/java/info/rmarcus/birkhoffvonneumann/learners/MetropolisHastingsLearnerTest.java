@@ -7,6 +7,7 @@ import java.util.function.ToDoubleFunction;
 import org.junit.Test;
 
 import info.rmarcus.birkhoffvonneumann.CoeffAndMatrix;
+import info.rmarcus.birkhoffvonneumann.learners.generalized_loss.MetropolisHastingsPermutationSearch;
 
 public class MetropolisHastingsLearnerTest {
 
@@ -30,8 +31,8 @@ public class MetropolisHastingsLearnerTest {
 
 		double finalLoss = lossFunc.applyAsDouble(search.getBest());
 
-		// it should really find the optimal (120) but because of noise we will accept anything better than 125
-		assertTrue(finalLoss < 125.0);
+		// it should really find the optimal (120) but because of noise we will accept anything better than 123
+		assertTrue(finalLoss < 123.0);
 
 	}
 

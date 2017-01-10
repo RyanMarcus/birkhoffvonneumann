@@ -1,4 +1,4 @@
-package info.rmarcus.birkhoffvonneumann.learners;
+package info.rmarcus.birkhoffvonneumann.learners.generalized_loss;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -17,9 +17,8 @@ import info.rmarcus.birkhoffvonneumann.CoeffAndMatrix.Swap;
 import info.rmarcus.birkhoffvonneumann.exceptions.BVNException;
 import info.rmarcus.birkhoffvonneumann.exceptions.BVNRuntimeException;
 
-public class CentralizedLA {
+public class CentralizedLA implements PermutationLearner {
 	
-	@SuppressWarnings("null")
 	private static final Logger l = Logger.getLogger(CentralizedLA.class.getName());
 
 	private double[][] w;
@@ -28,12 +27,14 @@ public class CentralizedLA {
 	private double@Nullable[][] best = null;
 	private double bestVal = Double.MIN_VALUE;
 	private BVNDecomposer bvn;
+	private ToDoubleFunction<double[][]> loss;
 
-	public CentralizedLA(int numItems, double learningRate, SamplingAlgorithm algo) {
+	public CentralizedLA(int numItems, double learningRate, SamplingAlgorithm algo, ToDoubleFunction<double[][]> loss) {
 		w = new double[numItems][numItems];
 		this.learningRate = learningRate;
 		this.bvn = new BVNDecomposer();
 		this.bvn.setSamplingAlgorithm(algo);
+		this.loss = loss;
 
 		// initialize our random guess where all permutations are equally likely
 		for (int i = 0; i < w.length; i++)
@@ -41,10 +42,10 @@ public class CentralizedLA {
 				w[i][j] = 1.0 / ((double)numItems); 
 	}
 
-	public void iterate(ToDoubleFunction<double[][]> lossFunc) {
+	public void iterate() {
 		try {
 			double[][] sample = bvn.sample(r, w);
-			double reward = 1.0 - lossFunc.applyAsDouble(sample);
+			double reward = 1.0 - loss.applyAsDouble(sample);
 			Set<Swap> swaps = CoeffAndMatrix.asSwaps(sample);
 			
 			if (bestVal < reward) {
@@ -100,9 +101,9 @@ public class CentralizedLA {
 
 
 
-		CentralizedLA search = new CentralizedLA(toSort.length, 0.1, SamplingAlgorithm.ENTROPY);
+		CentralizedLA search = new CentralizedLA(toSort.length, 0.1, SamplingAlgorithm.ENTROPY, lossFunc);
 		for (int i = 0; i < 10000; i++) {
-			search.iterate(lossFunc);
+			search.iterate();
 		}
 
 		for (double[] row : search.w) {
