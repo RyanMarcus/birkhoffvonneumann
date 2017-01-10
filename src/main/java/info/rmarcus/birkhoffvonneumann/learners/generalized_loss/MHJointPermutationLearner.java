@@ -83,7 +83,7 @@ public class MHJointPermutationLearner {
 	public void iterate() {
 		List<double[]> dirs = Arrays.stream(bp).map(p -> p.getRandomDirection(r)).collect(Collectors.toList());
 		List<double[][]> currents = Arrays.stream(bp).map(p -> p.getCurrentPoint()).collect(Collectors.toList());
-		double[] moveBy = r.doubles().limit(2).toArray();
+		double[] moveBy = r.doubles().limit(numPerms).toArray();
 
 		for (int i = 0; i < numPerms; i++) {
 			bp[i].movePoint(dirs.get(i), moveBy[i]);
@@ -118,5 +118,9 @@ public class MHJointPermutationLearner {
 		} catch (BVNException e) {
 			throw new BVNRuntimeException("Matrix that was bistochastic is no longer!" + e);
 		}
+	}
+
+	public List<double[][]> getBest() {
+		return best;
 	}
 }
