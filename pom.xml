@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>info.rmarcus</groupId>
 	<artifactId>birkhoffvonneumann</artifactId>
-	<version>0.0.1</version>
+	<version>0.1.0</version>
 	<name>Birkhoff-von Neumann Decomposition</name>
 	<description>A Birkhoff-von Neumann matrix decomposer</description>
 	<url>https://github.com/RyanMarcus/birkhoffvonneumann</url>
