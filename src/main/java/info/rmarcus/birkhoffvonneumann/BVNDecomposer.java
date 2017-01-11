@@ -199,7 +199,6 @@ public class BVNDecomposer {
 						continue;
 					
 					ent[row] += matrix[row][col] * Math.log(matrix[row][col]);
-					
 				}
 			}
 			
