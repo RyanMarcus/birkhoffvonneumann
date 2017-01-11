@@ -144,18 +144,19 @@ public class BVNDecomposer {
 		
 		Collections.shuffle(rowOrder, r);
 		
+		
 		boolean[] removedCols = new boolean[matrix.length];
 		
-		for (Integer selectedRow : rowOrder) {
-			// we now have the index of the row. Calculate
+		double[] rowSums = new double[matrix.length];
+		for (int i = 0; i < matrix.length; i++)
+			rowSums[i] = 1.0;
+		
+		for (int rowIdx = 0; rowIdx < matrix.length; rowIdx++) {
+			int selectedRow = rowOrder.get(rowIdx);
+			
+			// we now have the index of the row. get
 			// the remaining mass from the columns still available
-			double remainingMass = 0.0;
-			for (int col = 0; col < matrix.length; col++) {
-				if (removedCols[col])
-					continue;
-				
-				remainingMass += matrix[selectedRow][col];
-			}
+			double remainingMass = rowSums[selectedRow];
 			
 			// roll a random number between 0 and 1 and select accordingly
 			double v = r.nextDouble();
@@ -173,6 +174,13 @@ public class BVNDecomposer {
 			
 			if (bestColIdx == -1)
 				throw new BVNException("Unable to sample a row up to mass " + v);
+			
+
+			// update the row sums
+			for (int idxToUpdate = rowIdx+1; idxToUpdate < matrix.length; idxToUpdate++) {
+				int rowToUpdate = rowOrder.get(idxToUpdate);
+				rowSums[rowToUpdate] -= matrix[rowToUpdate][bestColIdx];
+			}
 			
 			removedCols[bestColIdx] = true;
 						
