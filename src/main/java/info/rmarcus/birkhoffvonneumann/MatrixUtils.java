@@ -293,6 +293,12 @@ public class MatrixUtils {
 		return toR;
 	}
 
+	public static double[][] preconditionedBistoch(int[] perm, double alpha) {
+		double[][] toR = new double[perm.length][perm.length];
+		
+		return toR;
+	}
+	
 	public static void printMatrix(double[][] matrix) {
 		for (double[] row : matrix) {
 			for (double itm : row) {

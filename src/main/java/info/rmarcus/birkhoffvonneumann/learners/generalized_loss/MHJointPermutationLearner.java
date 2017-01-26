@@ -22,10 +22,13 @@ package info.rmarcus.birkhoffvonneumann.learners.generalized_loss;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import info.rmarcus.birkhoffvonneumann.BVNDecomposer;
 import info.rmarcus.birkhoffvonneumann.MatrixUtils;
@@ -101,11 +104,26 @@ public class MHJointPermutationLearner {
 	}
 
 	public void iterate() {
+		iterate(IntStream.range(0, numPerms)
+				.mapToObj(i -> i)
+				.collect(Collectors.toSet()));
+	}
+	
+	public void iterate(int i) {
+		Set<Integer> s = new HashSet<>();
+		s.add(i);
+		iterate(s);
+	}
+
+	public void iterate(Set<Integer> toIterate) {
 		List<double[]> dirs = Arrays.stream(bp).map(p -> p.getRandomDirection(r)).collect(Collectors.toList());
 		List<double[][]> currents = Arrays.stream(bp).map(p -> p.getCurrentPoint()).collect(Collectors.toList());
 		double[] moveBy = r.doubles().limit(numPerms).toArray();
 
 		for (int i = 0; i < numPerms; i++) {
+			// only iterate the bistochastics that were given in the set
+			if (!toIterate.contains(i))
+				continue;
 			bp[i].movePoint(dirs.get(i), moveBy[i]);
 		}
 
@@ -139,7 +157,11 @@ public class MHJointPermutationLearner {
 			throw new BVNRuntimeException("Matrix that was bistochastic is no longer!" + e);
 		}
 	}
-
+	
+	public void precondition(int idx, double[][] bistoch) throws BVNException {
+		bp[idx].setCurrentPoint(bistoch);
+	}
+	
 	public List<double[][]> getBest() {
 		return best;
 	}
