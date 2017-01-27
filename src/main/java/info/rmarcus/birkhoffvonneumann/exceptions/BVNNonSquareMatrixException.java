@@ -20,7 +20,7 @@
  
 package info.rmarcus.birkhoffvonneumann.exceptions;
 
-public class BVNNonSquareMatrixException extends BVNException {
+public class BVNNonSquareMatrixException extends BVNRuntimeException {
 
 	private static final long serialVersionUID = 1L;
 	

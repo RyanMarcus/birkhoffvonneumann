@@ -37,6 +37,7 @@ import org.apache.commons.math3.linear.ArrayRealVector;
 import org.eclipse.jdt.annotation.NonNull;
 
 import info.rmarcus.NullUtils;
+import info.rmarcus.birkhoffvonneumann.exceptions.BVNException;
 import info.rmarcus.birkhoffvonneumann.exceptions.BVNRuntimeException;
 
 public class MatrixUtils {
@@ -293,9 +294,21 @@ public class MatrixUtils {
 		return toR;
 	}
 
-	public static double[][] preconditionedBistoch(int[] perm, double alpha) {
+	public static double[][] preconditionedBistoch(int[] perm, double alpha) throws BVNException {
 		double[][] toR = new double[perm.length][perm.length];
 		
+		for (int i = 0; i < toR.length; i++) {
+			for (int j = 0; j < toR[i].length; j++) {
+				toR[i][j] = alpha;
+			}
+		}
+		
+		for (int i = 0; i < perm.length; i++) {
+			toR[i][perm[i]] = 1.0;
+		}
+		
+		SinkhornBalancer.balance(toR);
+				
 		return toR;
 	}
 	

@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import info.rmarcus.birkhoffvonneumann.BVNDecomposer;
+import info.rmarcus.birkhoffvonneumann.DecompositionType;
 import info.rmarcus.birkhoffvonneumann.MatrixUtils;
 import info.rmarcus.birkhoffvonneumann.SamplingAlgorithm;
 import info.rmarcus.birkhoffvonneumann.exceptions.BVNException;
@@ -75,24 +76,24 @@ public class MHJointPermutationLearner {
 	private double modifiedLoss(List<double[][]> bistocs) {
 		BVNDecomposer bvn = new BVNDecomposer();
 		bvn.setSamplingAlgorithm(SamplingAlgorithm.GIBBS);
+		
 
 		double collector = 0.0;
 
 		try {
 			// take SAMPLES_PER_MATRIX samples from each of the bistocs given and return the average loss
-			for (int i = 0; i < SAMPLES_PER_MATRIX; i++) {
-				List<double[][]> samples = new ArrayList<>(numPerms);
+			// always include the highest probability schedule
+			List<double[][]> samples = new ArrayList<>(numPerms);
+			for (BirkhoffPolytope p : bp)
+				samples.add(bvn.meanPermutation(p.getCurrentPoint()));
+			collector += testSamples(samples);
+			
+			for (int i = 0; i < SAMPLES_PER_MATRIX-1; i++) {
+				samples = new ArrayList<>(numPerms);
 				for (BirkhoffPolytope p : bp)
 					samples.add(bvn.sample(r, p.getCurrentPoint()));
-
-				double sampleLoss = loss.applyAsDouble(samples);
-
-				if (sampleLoss < bestLoss) {
-					System.out.println("Found new best: " + sampleLoss);
-					bestLoss = sampleLoss;
-					best = samples;
-				}
-
+				
+				double sampleLoss = testSamples(samples);
 				collector += sampleLoss;
 			}
 			
@@ -101,6 +102,18 @@ public class MHJointPermutationLearner {
 			e.printStackTrace();
 			return Double.POSITIVE_INFINITY;
 		}
+	}
+	
+	private double testSamples(List<double[][]> samples) {
+		double sampleLoss = loss.applyAsDouble(samples);
+
+		if (sampleLoss < bestLoss) {
+			System.out.println("Found new best: " + sampleLoss);
+			bestLoss = sampleLoss;
+			best = samples;
+		}
+		
+		return sampleLoss;
 	}
 
 	public void iterate() {

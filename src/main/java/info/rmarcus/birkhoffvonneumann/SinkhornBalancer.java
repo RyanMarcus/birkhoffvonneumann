@@ -23,17 +23,17 @@ package info.rmarcus.birkhoffvonneumann;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
-import info.rmarcus.birkhoffvonneumann.exceptions.BVNException;
+import info.rmarcus.birkhoffvonneumann.exceptions.BVNRuntimeException;
 
 public class SinkhornBalancer {
 	private SinkhornBalancer() {
 		
 	}
 	
-	public static void balance(double[][] matrix) throws BVNException {
+	public static void balance(double[][] matrix) {
 		BVNUtils.checkSquare(matrix);
 		if (!BVNUtils.isNonNeg(matrix)) {
-			throw new BVNException("Input to Sinkhorn balancer must be non-negative.");
+			throw new BVNRuntimeException("Input to Sinkhorn balancer must be non-negative.");
 		}
 		
 		while (!BVNUtils.isBistochastic(matrix)) {

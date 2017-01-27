@@ -99,7 +99,7 @@ public class PermELearn {
 		
 		try {
 			SinkhornBalancer.balance(w);
-		} catch (BVNException e) {
+		} catch (BVNRuntimeException e) {
 			l.log(Level.WARNING, "Error in updateWeights", e);
 			throw new BVNRuntimeException("error while updating weight matrix: " + e.getMessage());
 		}
